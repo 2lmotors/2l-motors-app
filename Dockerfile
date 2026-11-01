@@ -16,10 +16,7 @@ RUN npm install --omit=dev
 # Copie du projet
 COPY . .
 
-# Port standard Render
-ENV PORT=3000
+# Environnement de production (le port est injecté dynamiquement par Render)
 ENV NODE_ENV=production
-
-EXPOSE 3000
 
 CMD ["node", "server.js"]
