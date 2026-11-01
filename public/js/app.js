@@ -51,6 +51,11 @@ createApp({
       recordingDuration: 0,
       recordingTimer: null,
 
+      // Voix d'homme Suisse Romande & Dictée vocale
+      swissVoiceAuto: localStorage.getItem('swiss_voice_auto') !== 'false', // activé par défaut
+      isDictating: false,
+      speechRecognizer: null,
+
       // Emoji picker
       showEmojiPicker: false,
       emojis: [
@@ -194,6 +199,14 @@ createApp({
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
+
+    // Pré-chargement des voix de synthèse vocale pour la voix suisse
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
 
     // Ferme le menu flottant d'options et le menu admin live lors d'un clic extérieur
     document.addEventListener('click', (e) => {
@@ -439,6 +452,13 @@ createApp({
           this.$nextTick(() => {
             if (this.autoScroll) this.scrollToBottom();
           });
+
+          // Lecture vocale automatique de l'Assistant IA avec la voix suisse si activé
+          if ((msg.username === 'Assistant IA' || msg.isAi) && this.swissVoiceAuto && msg.content) {
+            setTimeout(() => {
+              this.speakSwissVoice(msg.content, msg.id);
+            }, 300);
+          }
         }
 
         if (!this.currentUser || msg.user_id !== this.currentUser.id) {
@@ -1117,20 +1137,94 @@ createApp({
       }
     },
 
-    readTextMessage(msg) {
+    toggleSwissVoiceAuto() {
+      this.swissVoiceAuto = !this.swissVoiceAuto;
+      localStorage.setItem('swiss_voice_auto', this.swissVoiceAuto ? 'true' : 'false');
+      this.showToast('info', 'Voix Suisse 🇨🇭', this.swissVoiceAuto ? 'Lecture vocale automatique activée' : 'Lecture vocale désactivée');
+      if (!this.swissVoiceAuto && this.speakingMsgId) {
+        this.pauseTextMessage();
+      }
+    },
+
+    cleanTextForSwissVoice(text) {
+      if (!text) return '';
+      let clean = text
+        .replace(/```[\s\S]*?```/g, '') // Blocs de code
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Gras
+        .replace(/\*(.*?)\*/g, '$1')     // Italique
+        .replace(/#{1,6}\s?/g, '')       // Titres
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Liens
+        .replace(/👉|🔧|🌪️|⚡|⚙️|💨|🛠️|📍|📞|🏠|📅|💬|⚠️|✅|❌|🤖|🇨🇭|👨‍🔧/g, ' ') // Emojis
+        .replace(/\bsoixante-dix\b/gi, 'septante')
+        .replace(/\bquatre-vingts?\b/gi, 'huitante')
+        .replace(/\bquatre-vingt-dix\b/gi, 'nonante')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return clean;
+    },
+
+    getSwissMaleVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices() || [];
+      if (!voices.length) return null;
+
+      // 1. Voix Suisse Romande dédiée (fr-CH ou fr_CH)
+      let voice = voices.find(v => (v.lang === 'fr-CH' || v.lang === 'fr_CH') && /male|homme|guy/i.test(v.name));
+      if (voice) return voice;
+      voice = voices.find(v => v.lang === 'fr-CH' || v.lang === 'fr_CH');
+      if (voice) return voice;
+
+      // 2. Voix masculine française (Thomas, Henri, Claude, Mathieu, Nicolas, David, Georges, Guy, Google français...)
+      voice = voices.find(v => v.lang.startsWith('fr') && /male|homme|thomas|henri|paul|claude|mathieu|nicolas|david|georges|guy/i.test(v.name));
+      if (voice) return voice;
+
+      // 3. Voix Microsoft / Google masculine par exclusion des voix féminines connues
+      voice = voices.find(v => v.lang.startsWith('fr') && !/female|femme|julie|hortense|denise|celine|virginie|brigitte/i.test(v.name));
+      if (voice) return voice;
+
+      // 4. Fallback n'importe quelle voix française
+      voice = voices.find(v => v.lang.startsWith('fr'));
+      return voice || null;
+    },
+
+    speakSwissVoice(text, msgId = null) {
       if (!('speechSynthesis' in window)) {
-        this.showToast('error', 'Synthèse vocale non supportée');
+        this.showToast('error', 'Synthèse vocale', 'Votre appareil ne supporte pas la synthèse vocale.');
         return;
       }
+
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(msg.content);
-      utterance.lang = this.currentLang === 'en' ? 'en-US' : 'fr-FR';
-      utterance.rate = 1.0;
-      this.speakingMsgId = msg.id;
-      utterance.onend = () => { this.speakingMsgId = null; };
-      utterance.onerror = () => { this.speakingMsgId = null; };
+      const clean = this.cleanTextForSwissVoice(text);
+      if (!clean) return;
+
+      const utterance = new SpeechSynthesisUtterance(clean);
+      const voice = this.getSwissMaleVoice();
+      if (voice) {
+        utterance.voice = voice;
+      }
+      utterance.lang = (voice && voice.lang) ? voice.lang : 'fr-CH';
+
+      // Timbre et cadence d'homme suisse romand : voix posée, chaleureuse et mesurée
+      utterance.rate = 0.93;  // Cadence légèrement posée et détendue
+      utterance.pitch = 0.88; // Timbre grave masculin
+      utterance.volume = 1.0;
+
+      this.speakingMsgId = msgId;
+
+      utterance.onend = () => {
+        if (this.speakingMsgId === msgId) this.speakingMsgId = null;
+      };
+      utterance.onerror = () => {
+        if (this.speakingMsgId === msgId) this.speakingMsgId = null;
+      };
+
       window.speechSynthesis.speak(utterance);
+    },
+
+    readTextMessage(msg) {
+      if (!msg || !msg.content) return;
       this.activeMessageMenuId = null;
+      this.speakSwissVoice(msg.content, msg.id);
     },
 
     pauseTextMessage(msg) {
@@ -1139,6 +1233,56 @@ createApp({
       }
       this.speakingMsgId = null;
       this.activeMessageMenuId = null;
+    },
+
+    toggleSpeechDictation() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        this.showToast('error', 'Dictée vocale non disponible', 'La reconnaissance vocale nécessite Google Chrome, Edge ou Safari.');
+        return;
+      }
+
+      if (this.isDictating && this.speechRecognizer) {
+        try { this.speechRecognizer.stop(); } catch(e) {}
+        this.isDictating = false;
+        return;
+      }
+
+      try {
+        const recognizer = new SpeechRecognition();
+        recognizer.lang = 'fr-CH';
+        recognizer.continuous = false;
+        recognizer.interimResults = false;
+
+        recognizer.onstart = () => {
+          this.isDictating = true;
+          this.showToast('info', 'Microphone ouvert 🎙️', 'Parlez, votre message est retranscrit en direct...');
+        };
+
+        recognizer.onresult = (event) => {
+          if (event.results && event.results[0] && event.results[0][0]) {
+            const transcript = event.results[0][0].transcript;
+            if (transcript) {
+              this.newMessage = (this.newMessage ? (this.newMessage.trim() + ' ') : '') + transcript;
+            }
+          }
+        };
+
+        recognizer.onerror = (e) => {
+          console.warn('[SpeechRecognition] Erreur:', e);
+          this.isDictating = false;
+        };
+
+        recognizer.onend = () => {
+          this.isDictating = false;
+        };
+
+        this.speechRecognizer = recognizer;
+        recognizer.start();
+      } catch (err) {
+        console.error('[SpeechRecognition] Erreur:', err);
+        this.isDictating = false;
+      }
     },
 
     downloadMediaMessage(msg) {

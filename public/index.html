@@ -271,11 +271,39 @@
 
         <!-- Top sub-header -->
         <div class="chat-top-status-bar">
-          <div class="chat-profile-badge" v-if="activeRoom.startsWith('ai_')">
-            <div class="ai-avatar-glow">🤖</div>
-            <div>
-              <div style="font-weight:700; color:#fff; font-size:13.5px;">{{ t('chat.aiHeader') }}</div>
-              <div style="font-size:11px; color:#22c55e;">{{ t('chat.aiStatus') }}</div>
+          <div class="chat-profile-badge" v-if="activeRoom.startsWith('ai_')" style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="ai-avatar-glow">🤖</div>
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:13.5px; display:flex; align-items:center; gap:6px;">
+                  <span>{{ t('chat.aiHeader') }}</span>
+                  <span style="font-size:11px; padding:2px 6px; background:rgba(220,38,38,0.25); border:1px solid rgba(239,68,68,0.4); border-radius:10px; color:#fca5a5;">🇨🇭 Homme</span>
+                </div>
+                <div style="font-size:11px; color:#22c55e;">{{ t('chat.aiStatus') }}</div>
+              </div>
+            </div>
+
+            <!-- Contrôle Voix Suisse automatique -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button
+                class="swiss-voice-toggle-btn"
+                :class="{ active: swissVoiceAuto }"
+                @click="toggleSwissVoiceAuto"
+                :title="swissVoiceAuto ? 'Voix d\'homme suisse automatique activée (cliquer pour couper)' : 'Activer la lecture vocale automatique'"
+              >
+                <span>🇨🇭</span>
+                <span>{{ swissVoiceAuto ? 'Voix : ON' : 'Voix : OFF' }}</span>
+                <span v-if="speakingMsgId" style="font-size:11px;">🔊</span>
+              </button>
+              <button
+                v-if="speakingMsgId"
+                class="btn btn-sm btn-danger"
+                style="padding:2px 8px; font-size:11px; border-radius:14px;"
+                @click="pauseTextMessage()"
+                title="Arrêter la lecture"
+              >
+                ⏹️ Stop
+              </button>
             </div>
           </div>
 
@@ -512,6 +540,22 @@
               <div class="mockup3-bubble-content">
                 <span v-if="msg.content" v-html="formatMessageContent(msg.content)"></span>
 
+                <!-- Bouton d'écoute avec la voix d'homme suisse pour l'Assistant IA -->
+                <div v-if="(msg.username === 'Assistant IA' || msg.isAi) && msg.content" class="ai-voice-play-bar">
+                  <button
+                    class="ai-voice-btn"
+                    :class="{ 'is-speaking': speakingMsgId === msg.id }"
+                    @click="speakingMsgId === msg.id ? pauseTextMessage(msg) : readTextMessage(msg)"
+                    :title="speakingMsgId === msg.id ? 'Arrêter la lecture' : 'Écouter avec la voix d\'homme suisse'"
+                  >
+                    <span class="ai-voice-icon">{{ speakingMsgId === msg.id ? '⏹️' : '🔊' }}</span>
+                    <span class="ai-voice-text">{{ speakingMsgId === msg.id ? 'Arrêter la voix' : 'Écouter (Voix Suisse 🇨🇭)' }}</span>
+                    <span class="ai-voice-wave" v-if="speakingMsgId === msg.id">
+                      <span></span><span></span><span></span>
+                    </span>
+                  </button>
+                </div>
+
                 <div v-if="msg.media_url" class="message-media">
                   <div class="chat-media-wrapper" v-if="msg.media_type === 'image' || msg.media_type === 'video'">
                     <img v-if="msg.media_type === 'image'" :src="msg.media_url" class="chat-media-img" @click="openLightbox(msg.media_url)" />
@@ -644,6 +688,16 @@
               <input type="file" accept="image/*,video/*" style="display:none" @change="handleFileUpload" ref="fileInput" />
             </label>
           </div>
+
+          <!-- Dictée vocale directe (parler pour écrire) -->
+          <button
+            class="input-circle-btn"
+            :class="{ 'dictation-active': isDictating }"
+            @click="toggleSpeechDictation"
+            :title="isDictating ? 'Arrêter la dictée vocale' : 'Dictée vocale : dictez votre message en parlant'"
+          >
+            🗣️
+          </button>
 
           <button
             class="input-circle-btn"

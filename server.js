@@ -726,15 +726,16 @@ Une dépression trop forte dans le collecteur d'admission, combinée à une segm
   }
 
   // Formule d'accueil et d'orientation générale
-  return `🔧 **CONSULTANT TECHNIQUE SUPÉRIEUR MOTORS 2L**
+  return `🔧 **CHEF D'ATELIER MOTORS 2L (AIGLE, SUISSE)**
 
-J'ai bien pris en compte votre demande. Afin de vous donner le **diagnostic exact, les codes défauts probables (DTC) et le devis constructeur précis** :
-1. **Marque, Modèle et Cylindrée** (ex: *Audi A3 2.0 TDI 150ch*, *Peugeot 208 1.2 PureTech 110*...)
-2. **Année de première mise en circulation**
-3. **Kilométrage actuel**
-4. **Symptômes constatés** : *Voyant moteur fixe/clignotant ? Perte de puissance ? Bruit suspect à chaud ou à froid ? Pédale molle ?*
+Adieu ! Ça joue bien ? C'est le chef d'atelier de MOTORS 2L à Aigle. J'ai bien reçu votre message.
 
-Détaillez vos observations, je vous apporte l'analyse mécanique chirurgicale !`;
+Pour vous sortir le diagnostic au poil et le devis exact en CHF, dites-moi juste :
+1. **Marque, Modèle et Motorisation** (ex: *Audi A3 2.0 TDI*, *Golf 7*, *Yamaha TMAX*...)
+2. **Année et kilométrage au compteur** (en milliers de bornes)
+3. **Ce qui se passe** : un voyant au tableau de bord, un bruit suspect, une fumée ou une perte de puissance ?
+
+Expliquez-moi tout ça tranquillement, et ça joue impec ! Passez aussi sans autre au Chemin de la Biole 10 à Aigle, on vous branche la valise autour d'un bon café. Tout de bon !`;
 }
 
 // -------------------------------------------------------------
