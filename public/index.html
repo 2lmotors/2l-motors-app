@@ -273,13 +273,15 @@
         <div class="chat-top-status-bar">
           <div class="chat-profile-badge" v-if="activeRoom.startsWith('ai_')" style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <div class="ai-avatar-glow">🤖</div>
+              <div class="ai-avatar-glow" style="overflow:hidden; padding:2px; background:linear-gradient(135deg, #cc0000, #1c1e23) !important;">
+                <img src="/img/mecano.svg" alt="Léo Mécano" style="width:100%; height:100%; object-fit:contain;" />
+              </div>
               <div>
                 <div style="font-weight:700; color:#fff; font-size:13.5px; display:flex; align-items:center; gap:6px;">
-                  <span>{{ t('chat.aiHeader') }}</span>
-                  <span style="font-size:11px; padding:2px 6px; background:rgba(220,38,38,0.25); border:1px solid rgba(239,68,68,0.4); border-radius:10px; color:#fca5a5;">🇨🇭 Homme</span>
+                  <span>Léo &bull; Chef d'Atelier Virtuel</span>
+                  <span style="font-size:11px; padding:2px 6px; background:rgba(220,38,38,0.25); border:1px solid rgba(239,68,68,0.4); border-radius:10px; color:#fca5a5;">🇨🇭 Voix Suisse</span>
                 </div>
-                <div style="font-size:11px; color:#22c55e;">{{ t('chat.aiStatus') }}</div>
+                <div style="font-size:11px; color:#22c55e;">● En ligne pour vous conseiller 24/7</div>
               </div>
             </div>
 
@@ -354,6 +356,13 @@
             <button class="chat-tab" :class="{ active: !showMedia }" @click="showMedia = false">{{ t('nav.chat') }}</button>
             <button class="chat-tab" :class="{ active: showMedia }" @click="toggleMediaView()">{{ t('nav.media') }}</button>
           </div>
+        </div>
+
+        <!-- Barre d'état dictée vocale (Comme sur le site web) -->
+        <div v-if="isDictating" class="voice-status-bar" style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(90deg, rgba(220,38,38,0.25), rgba(185,28,28,0.4)); border-bottom:1px solid rgba(239,68,68,0.45); padding:8px 14px; color:#fca5a5; font-size:12.5px; font-weight:700;">
+          <span style="font-size:16px;">🎙️</span>
+          <span>Léo vous écoute... Parlez dans votre microphone !</span>
+          <button class="btn btn-sm btn-danger" style="margin-left:10px; padding:2px 8px; font-size:11px; border-radius:12px;" @click="toggleSpeechDictation">Arrêter</button>
         </div>
 
         <!-- Bandeau Live Vidéo actif pour l'administrateur en pause/standby -->
