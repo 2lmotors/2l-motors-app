@@ -1155,9 +1155,30 @@ createApp({
         .replace(/#{1,6}\s?/g, '')       // Titres
         .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Liens
         .replace(/👉|🔧|🌪️|⚡|⚙️|💨|🛠️|📍|📞|🏠|📅|💬|⚠️|✅|❌|🤖|🇨🇭|👨‍🔧/g, ' ') // Emojis
+        .replace(/\bCHF\b/gi, 'francs suisses')
+        .replace(/\+41/g, 'plus 41 ')
+        .replace(/•/g, ', ')
         .replace(/\bsoixante-dix\b/gi, 'septante')
-        .replace(/\bquatre-vingts?\b/gi, 'huitante')
+        .replace(/\bsoixante-et-onze\b/gi, 'septante-et-un')
+        .replace(/\bsoixante-douze\b/gi, 'septante-deux')
+        .replace(/\bsoixante-treize\b/gi, 'septante-trois')
+        .replace(/\bsoixante-quatorze\b/gi, 'septante-quatre')
+        .replace(/\bsoixante-quinze\b/gi, 'septante-cinq')
+        .replace(/\bsoixante-seize\b/gi, 'septante-seize')
+        .replace(/\bsoixante-dix-sept\b/gi, 'septante-sept')
+        .replace(/\bsoixante-dix-huit\b/gi, 'septante-huit')
+        .replace(/\bsoixante-dix-neuf\b/gi, 'septante-neuf')
         .replace(/\bquatre-vingt-dix\b/gi, 'nonante')
+        .replace(/\bquatre-vingt-onze\b/gi, 'nonante-et-un')
+        .replace(/\bquatre-vingt-douze\b/gi, 'nonante-deux')
+        .replace(/\bquatre-vingt-treize\b/gi, 'nonante-trois')
+        .replace(/\bquatre-vingt-quatorze\b/gi, 'nonante-quatre')
+        .replace(/\bquatre-vingt-quinze\b/gi, 'nonante-cinq')
+        .replace(/\bquatre-vingt-seize\b/gi, 'nonante-seize')
+        .replace(/\bquatre-vingt-dix-sept\b/gi, 'nonante-sept')
+        .replace(/\bquatre-vingt-dix-huit\b/gi, 'nonante-huit')
+        .replace(/\bquatre-vingt-dix-neuf\b/gi, 'nonante-neuf')
+        .replace(/\bquatre-vingts?\b/gi, 'huitante')
         .replace(/\s+/g, ' ')
         .trim();
       return clean;

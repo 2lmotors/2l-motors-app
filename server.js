@@ -728,14 +728,14 @@ Une dépression trop forte dans le collecteur d'admission, combinée à une segm
   // Formule d'accueil et d'orientation générale
   return `🔧 **CHEF D'ATELIER MOTORS 2L (AIGLE, SUISSE)**
 
-Adieu ! Ça joue bien ? C'est le chef d'atelier de MOTORS 2L à Aigle. J'ai bien reçu votre message.
+Bonjour, je suis le chef d'atelier de MOTORS 2L à Aigle. J'ai bien pris connaissance de votre demande.
 
-Pour vous sortir le diagnostic au poil et le devis exact en CHF, dites-moi juste :
-1. **Marque, Modèle et Motorisation** (ex: *Audi A3 2.0 TDI*, *Golf 7*, *Yamaha TMAX*...)
-2. **Année et kilométrage au compteur** (en milliers de bornes)
-3. **Ce qui se passe** : un voyant au tableau de bord, un bruit suspect, une fumée ou une perte de puissance ?
+Afin de vous établir un diagnostic technique précis et un devis personnalisé en CHF :
+1. **Marque, modèle et motorisation** de votre véhicule
+2. **Année de mise en circulation et kilométrage actuel**
+3. **Symptômes constatés** (voyant moteur allumé, bruit anormal, perte de puissance, comportement au freinage...)
 
-Expliquez-moi tout ça tranquillement, et ça joue impec ! Passez aussi sans autre au Chemin de la Biole 10 à Aigle, on vous branche la valise autour d'un bon café. Tout de bon !`;
+Nous vous accueillons à notre atelier au Chemin de la Biole 10 à Aigle pour un passage à la valise de diagnostic. Restant à votre entière disposition.`;
 }
 
 // -------------------------------------------------------------
