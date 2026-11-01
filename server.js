@@ -1434,22 +1434,26 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🔧 2LMotors HTTP démarré sur http://localhost:${PORT} et http://192.168.1.51:${PORT}`);
 });
 
-// Serveur HTTPS Sécurisé (Indispensable pour débloquer Micro & Caméra sur iPhone / Android)
+// Serveur HTTPS Sécurisé local (uniquement en environnement de développement local)
 const sslKeyPath = path.join(__dirname, 'ssl', 'key.pem');
 const sslCertPath = path.join(__dirname, 'ssl', 'cert.pem');
 
-if (fs.existsSync(sslKeyPath) && fs.existsSync(sslCertPath)) {
-  const httpsServer = https.createServer({
-    key: fs.readFileSync(sslKeyPath),
-    cert: fs.readFileSync(sslCertPath)
-  }, app);
+if (!process.env.RENDER && process.env.NODE_ENV !== 'production' && fs.existsSync(sslKeyPath) && fs.existsSync(sslCertPath)) {
+  try {
+    const httpsServer = https.createServer({
+      key: fs.readFileSync(sslKeyPath),
+      cert: fs.readFileSync(sslCertPath)
+    }, app);
 
-  io.attach(httpsServer);
+    io.attach(httpsServer);
 
-  httpsServer.listen(HTTPS_PORT, '0.0.0.0', () => {
-    console.log(`🔒 2LMotors HTTPS Sécurisé : https://192.168.1.51:${HTTPS_PORT}`);
-    console.log(`   👉 Utilisez cette adresse HTTPS sur votre smartphone pour débloquer Micro & Caméra !\n`);
-  });
+    httpsServer.listen(HTTPS_PORT, '0.0.0.0', () => {
+      console.log(`🔒 2LMotors HTTPS Sécurisé : https://192.168.1.51:${HTTPS_PORT}`);
+      console.log(`   👉 Utilisez cette adresse HTTPS sur votre smartphone pour débloquer Micro & Caméra !\n`);
+    });
+  } catch (sslErr) {
+    console.warn('[HTTPS Local] Erreur démarrage serveur HTTPS:', sslErr.message);
+  }
 }
 
 

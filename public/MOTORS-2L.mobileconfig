@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -30,7 +30,7 @@
             <key>Precomposed</key>
             <true/>
             <key>URL</key>
-            <string>https://192.168.1.51:3443</string>
+            <string>https://twol-motors-app.onrender.com</string>
         </dict>
     </array>
     <key>PayloadDescription</key>
