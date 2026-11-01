@@ -8,10 +8,6 @@
     "dev": "node server.js"
   },
   "dependencies": {
-    "@capacitor/android": "^6.0.0",
-    "@capacitor/cli": "^6.0.0",
-    "@capacitor/core": "^6.0.0",
-    "@capacitor/ios": "^6.0.0",
     "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^13.0.3",
@@ -23,5 +19,11 @@
     "selfsigned": "^5.5.0",
     "socket.io": "^4.7.2",
     "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0"
   }
 }

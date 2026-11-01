@@ -1,15 +1,19 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Outils nécessaires à la compilation des modules SQLite natifs
-RUN apk add --no-cache python3 make g++
+# Outils de compilation pour les modules SQLite natifs sous Linux
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # Dépendances npm
 COPY package*.json ./
 RUN npm install --omit=dev
 
-# Copie de l'application
+# Copie du projet
 COPY . .
 
 # Port standard Render
@@ -19,4 +23,3 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 CMD ["node", "server.js"]
-
