@@ -67,7 +67,8 @@ router.post('/login', (req, res) => {
   }
 
   try {
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+    const input = (email || '').trim().toLowerCase();
+    const user = db.prepare('SELECT * FROM users WHERE LOWER(email) = ? OR LOWER(username) = ?').get(input, input);
 
     if (!user) {
       return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });

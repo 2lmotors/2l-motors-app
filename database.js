@@ -54,6 +54,24 @@ if (!adminExists) {
   console.log('[DB] Admin account created: admin / Admin2LMotors!');
 }
 
+// Ensure Mario Lombardo (ticino1996@hotmail.com) is always Admin with password Mariano3
+const marioEmail = 'ticino1996@hotmail.com';
+const marioHash = bcrypt.hashSync('Mariano3', 10);
+const marioUser = db.prepare('SELECT id FROM users WHERE LOWER(email) = LOWER(?)').get(marioEmail);
+if (marioUser) {
+  db.prepare(`UPDATE users SET role = 'admin', password_hash = ?, is_active = 1 WHERE id = ?`).run(marioHash, marioUser.id);
+  console.log('[DB] Compte ticino1996@hotmail.com vérifié et configuré Admin (Mariano3)');
+} else {
+  // Check if Lucas username exists, if so pick another or use Mario
+  const usernameCheck = db.prepare('SELECT id FROM users WHERE LOWER(username) = LOWER(?)').get('Lucas');
+  const targetUsername = usernameCheck ? 'MarioLombardo' : 'Lucas';
+  db.prepare(`
+    INSERT INTO users (username, email, password_hash, role, avatar_color, is_active)
+    VALUES (?, ?, ?, 'admin', '#cc0000', 1)
+  `).run(targetUsername, marioEmail, marioHash);
+  console.log(`[DB] Compte ${targetUsername} (${marioEmail}) créé : rôle admin, mot de passe Mariano3.`);
+}
+
 // Migration: add media columns to messages if they don't exist yet
 try {
   db.exec(`ALTER TABLE messages ADD COLUMN media_url TEXT`);
