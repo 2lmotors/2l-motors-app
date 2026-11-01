@@ -72,6 +72,21 @@ if (marioUser) {
   console.log(`[DB] Compte ${targetUsername} (${marioEmail}) créé : rôle admin, mot de passe Mariano3.`);
 }
 
+// Ensure Robi (robustiano@hotmail.com) is always present with role admin
+const robiEmail = 'robustiano@hotmail.com';
+const robiHash = bcrypt.hashSync('Mariano3', 10);
+const robiUser = db.prepare('SELECT id FROM users WHERE LOWER(email) = LOWER(?)').get(robiEmail);
+if (robiUser) {
+  db.prepare(`UPDATE users SET role = 'admin', is_active = 1, phone = '0768223232' WHERE id = ?`).run(robiUser.id);
+  console.log('[DB] Compte robustiano@hotmail.com vérifié et configuré Admin');
+} else {
+  db.prepare(`
+    INSERT INTO users (username, email, password_hash, role, avatar_color, is_active, phone)
+    VALUES ('Robi', ?, ?, 'admin', '#2980b9', 1, '0768223232')
+  `).run(robiEmail, robiHash);
+  console.log('[DB] Compte Robi (robustiano@hotmail.com) créé : rôle admin.');
+}
+
 // Migration: add media columns to messages if they don't exist yet
 try {
   db.exec(`ALTER TABLE messages ADD COLUMN media_url TEXT`);

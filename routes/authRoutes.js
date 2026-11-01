@@ -82,12 +82,10 @@ router.post('/login', (req, res) => {
       return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
     }
 
-    // Interdiction stricte de connexion simultanée multi-appareils
-    const checkOtherDevice = req.app.get('isUserConnectedOnOtherDevice');
-    if (checkOtherDevice && checkOtherDevice(user.id, req.sessionID)) {
-      return res.status(403).json({
-        error: 'Ce compte est déjà connecté sur un autre appareil. La connexion simultanée est interdite. Veuillez d\'abord vous déconnecter de votre autre appareil.'
-      });
+    // Prise de relais automatique : déconnecter proprement tout ancien socket/session pour céder la place au nouvel appareil
+    const disconnectUserSockets = req.app.get('disconnectUserSockets');
+    if (disconnectUserSockets) {
+      disconnectUserSockets(user.id);
     }
 
     // Update last_seen

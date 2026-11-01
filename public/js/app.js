@@ -405,6 +405,11 @@ createApp({
         window.location.href = '/login.html?error=already_connected';
       });
 
+      this.socket.on('device_replaced', (data) => {
+        alert(data.message || 'Votre session a été reprise sur un autre appareil.');
+        window.location.href = '/login.html?reason=replaced';
+      });
+
       this.socket.on('disconnect', () => {
         this.showToast('error', 'Connexion perdue', 'Reconnexion...');
       });

@@ -478,6 +478,10 @@
           this.error = 'Ce compte est déjà connecté sur un autre appareil. La connexion simultanée est interdite.';
           return;
         }
+        if (params.get('reason') === 'replaced') {
+          this.error = 'Votre session a été ouverte sur un autre appareil ou rechargée.';
+          return;
+        }
         if (params.get('reason') === 'inactivity') {
           this.error = 'Vous avez été déconnecté suite à une inactivité de 15 minutes dans le chat.';
           return;

@@ -38,6 +38,7 @@ const db = require('./database');
 const gemini = require('./gemini');
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: '*' },
@@ -210,7 +211,14 @@ function disconnectUserSockets(userId) {
   for (const [sockId, u] of onlineUsers.entries()) {
     if (u.id === userId) {
       const sock = io.sockets.sockets.get(sockId);
-      if (sock) sock.disconnect(true);
+      if (sock) {
+        try {
+          sock.emit('device_replaced', {
+            message: 'Votre session a été reprise sur un autre appareil ou onglet.'
+          });
+          sock.disconnect(true);
+        } catch(e) {}
+      }
       onlineUsers.delete(sockId);
     }
   }
@@ -922,25 +930,21 @@ io.on('connection', (socket) => {
   const user = sess.user;
   const currentSessionId = socket.request.sessionID;
 
-  // Règle stricte anti-connexion simultanée : interdire si déjà connecté sur un autre appareil
-  const otherDeviceSocket = Array.from(onlineUsers.entries()).find(
-    ([sId, u]) => u.id === user.id && u.sessionID && u.sessionID !== currentSessionId
-  );
-
-  if (otherDeviceSocket) {
-    console.log(`[Anti-MultiDevice] Connexion bloquée pour ${user.username} : compte déjà actif sur un autre appareil.`);
-    socket.emit('device_conflict', {
-      error: 'Ce compte est déjà connecté sur un autre appareil. La connexion simultanée est interdite.'
-    });
-    setTimeout(() => socket.disconnect(true), 100);
-    return;
-  }
-
-  // Si c'est le même appareil qui recharge sa page (même sessionID, fermeture des anciens sockets fantômes)
+  // Prise de relais automatique et fermeture immédiate des anciennes sessions/sockets pour cet utilisateur
   for (const [oldSockId, u] of onlineUsers.entries()) {
     if (u.id === user.id && oldSockId !== socket.id) {
       const oldSock = io.sockets.sockets.get(oldSockId);
-      if (oldSock) oldSock.disconnect(true);
+      if (oldSock) {
+        if (u.sessionID && u.sessionID !== currentSessionId) {
+          console.log(`[Anti-MultiDevice] Prise de relais pour ${user.username} : déconnexion de l'ancien appareil.`);
+          try {
+            oldSock.emit('device_replaced', {
+              message: 'Votre session a été reprise sur un autre appareil ou onglet.'
+            });
+          } catch(e) {}
+        }
+        try { oldSock.disconnect(true); } catch(e) {}
+      }
       onlineUsers.delete(oldSockId);
     }
   }

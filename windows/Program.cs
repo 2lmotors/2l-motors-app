@@ -18,14 +18,17 @@ namespace Motors2L
                 ServicePointManager.ServerCertificateValidationCallback = 
                     (sender, cert, chain, sslPolicyErrors) => true;
 
-                string targetUrl = "https://192.168.1.51:3443";
+                string targetUrl = "https://twol-motors-app.onrender.com";
                 
                 if (args != null && args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
                 {
                     targetUrl = args[0].Trim();
                 }
 
-                EnsureServerRunning();
+                if (targetUrl.Contains("localhost") || targetUrl.Contains("127.0.0.1") || targetUrl.Contains("192.168."))
+                {
+                    EnsureServerRunning();
+                }
 
                 string edge = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Microsoft\Edge\Application\msedge.exe");
                 if (!File.Exists(edge))
