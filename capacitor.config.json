@@ -1,0 +1,9 @@
+{
+  "appId": "com.motors2l.app",
+  "appName": "MOTORS 2L",
+  "webDir": "public",
+  "server": {
+    "url": "https://192.168.1.51:3443",
+    "cleartext": true
+  }
+}

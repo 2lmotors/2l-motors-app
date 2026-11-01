@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panneau de Gestion Atelier | 2L MOTORS LOMBARDO</title>
+  <link rel="stylesheet" href="/site/css/style.css">
+  <style>
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-top: 0.5rem;
+    }
+    .admin-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="navbar">
+      <div class="logo-container">
+        <img src="/site/img/logo.jpg" class="logo-img" alt="Logo 2L Motors">
+        <div class="brand-name">ADMIN <span>2L MOTORS</span></div>
+      </div>
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <span style="font-size: 0.85rem; color: #34d399;">● Mode Gestion</span>
+        <a href="/" class="btn btn-outline btn-sm">Voir site</a>
+        <button onclick="handleLogout()" class="btn btn-outline btn-sm" style="color: #fda4af;">Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 2.2rem;">Gestionnaire 2L MOTORS LOMBARDO</h1>
+      <p style="color: var(--text-muted);">Suivi centralisé des demandes de devis, des réclamations SAV et des clients.</p>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <h3>Clients Inscrits</h3>
+        <div class="stat-number" id="statClients">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Devis en Attente</h3>
+        <div class="stat-number" id="statQuotes" style="color: #f59e0b;">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Dossiers SAV Actifs</h3>
+        <div class="stat-number" id="statSav" style="color: #38bdf8;">-</div>
+      </div>
+    </div>
+
+    <!-- Configuration IA Google Gemini -->
+    <div class="admin-section" style="border: 1px solid rgba(56, 189, 248, 0.4); background: linear-gradient(145deg, rgba(19, 27, 46, 0.95), rgba(15, 23, 42, 0.98));">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.35rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🤖</span> Intelligence Artificielle Google Gemini (Mécano Léo)
+          </h2>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.25rem;">
+            Permet à votre assistant virtuel de réaliser des pré-diagnostics mécaniques et de conseiller vos clients 24/7.
+          </p>
+        </div>
+        <div id="geminiStatusBadge">
+          <span class="badge badge-warning">Vérification du statut...</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+        <input type="password" id="geminiApiKeyInput" class="form-control" placeholder="Collez votre clé API Gemini (ex: AIzaSy...)" style="flex: 1; min-width: 280px;">
+        <button class="btn btn-primary btn-sm" onclick="saveGeminiApiKey()">
+          💾 Enregistrer la Clé
+        </button>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn btn-outline btn-sm">
+          🔗 Obtenir une clé gratuite sur Google AI Studio
+        </a>
+      </div>
+      <div id="geminiKeyAlert" style="margin-top: 0.75rem; font-size: 0.82rem; color: #34d399; display: none;"></div>
+    </div>
+
+    <!-- Gestion des Devis -->
+    <div class="admin-section">
+      <div class="section-header" style="text-align: left; margin-bottom: 1.5rem;">
+        <h2>📋 Demandes de Devis Réparations</h2>
+        <p>Attribuez un montant et transmettez vos remarques techniques aux clients.</p>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Client</th>
+              <th>Téléphone</th>
+              <th>Immat</th>
+              <th>Panne / Service</th>
+              <th>Montant (CHF)</th>
+              <th>Statut</th>
+              <th>Actions Atelier</th>
+            </tr>
+          </thead>
+          <tbody id="adminQuotesTable">
+            <tr><td colspan="8" style="text-align: center;">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Gestion du SAV -->
+    <div class="admin-section">
+      <div class="section-header" style="text-align: left; margin-bottom: 1.5rem;">
+        <h2>🛠️ Suivi & Réponses SAV</h2>
+        <p>Répondez aux questions et réclamations de vos clients.</p>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Client</th>
+              <th>Titre du problème</th>
+              <th>Description</th>
+              <th>Statut</th>
+              <th>Réponse Atelier</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminSavTable">
+            <tr><td colspan="7" style="text-align: center;">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Fichier Clients -->
+    <div class="admin-section">
+      <div class="section-header" style="text-align: left; margin-bottom: 1.5rem;">
+        <h2>👥 Base de Données Clients</h2>
+        <p>Coordonnées de l'ensemble de vos clients inscrits.</p>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nom & Prénom</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Adresse</th>
+              <th>Date d'inscription</th>
+            </tr>
+          </thead>
+          <tbody id="adminClientsTable">
+            <tr><td colspan="6" style="text-align: center;">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODALE : CHIFFRER UN DEVIS -->
+  <div class="modal-overlay" id="modalEditQuote">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('modalEditQuote')">✕</button>
+      <h3 style="margin-bottom: 1.25rem;">Chiffrage & Validation de Devis</h3>
+      <form onsubmit="saveQuoteEdit(event)">
+        <input type="hidden" id="editQuoteId">
+        <div class="form-group">
+          <label>Montant estimé TTC (€)</label>
+          <input type="number" step="0.01" id="editQuotePrice" class="form-control" placeholder="Ex: 249.00" required>
+        </div>
+        <div class="form-group">
+          <label>Statut du dossier</label>
+          <select id="editQuoteStatus" class="form-control">
+            <option value="en_attente">En attente d'analyse</option>
+            <option value="chiffre">Devis chiffré (Envoyé au client)</option>
+            <option value="accepte">Accepté par le client</option>
+            <option value="termine">Réparation terminée / Véhicule prêt</option>
+            <option value="refuse">Refusé</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Remarques de l'atelier pour le client</label>
+          <textarea id="editQuoteNotes" class="form-control" rows="3" placeholder="Pièces commandées origine constructeur, intervention prévue sous 48h..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Valider et notifier le client</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALE : RÉPONDRE AU SAV -->
+  <div class="modal-overlay" id="modalEditSav">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('modalEditSav')">✕</button>
+      <h3 style="margin-bottom: 1.25rem;">Réponse technique SAV</h3>
+      <form onsubmit="saveSavEdit(event)">
+        <input type="hidden" id="editSavId">
+        <div class="form-group">
+          <label>Statut du ticket</label>
+          <select id="editSavStatus" class="form-control">
+            <option value="ouvert">Ouvert</option>
+            <option value="en_cours">En cours de traitement</option>
+            <option value="resolu">Résolu</option>
+            <option value="ferme">Fermé</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Réponse du mécanicien / atelier</label>
+          <textarea id="editSavReply" class="form-control" rows="4" placeholder="Indiquez ici les explications, les consignes ou invitez le client à repasser à l'atelier sans frais..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Enregistrer la réponse</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    async function loadAdminData() {
+      try {
+        const res = await fetch('/api/admin/overview');
+        if (res.status === 401 || res.status === 403) {
+          alert("Accès réservé au garage. Veuillez vous connecter avec le compte gestionnaire.");
+          window.location.href = '/login.html';
+          return;
+        }
+        const data = await res.json();
+
+        // Stats
+        document.getElementById('statClients').textContent = data.stats.totalUsers;
+        document.getElementById('statQuotes').textContent = data.stats.quotesWaiting;
+        document.getElementById('statSav').textContent = data.stats.savOpen;
+
+        // Devis
+        const qTbody = document.getElementById('adminQuotesTable');
+        if (data.quotes.length === 0) {
+          qTbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Aucune demande de devis.</td></tr>';
+        } else {
+          qTbody.innerHTML = data.quotes.map(q => `
+            <tr>
+              <td>#${q.id}</td>
+              <td><strong>${q.prenom} ${q.nom}</strong><br><small style="color:#94a3b8;">${q.email}</small></td>
+              <td>${q.telephone || '-'}</td>
+              <td><span class="badge badge-info">${q.immatriculation || 'Non précisée'}</span></td>
+              <td><strong>${q.service_titre || 'Réparation personnalisée'}</strong><br><small>${q.description_panne}</small></td>
+              <td><strong>${q.montant_estime ? q.montant_estime.toFixed(2) + ' CHF' : '<span style="color:#f59e0b;">Non chiffré</span>'}</strong></td>
+              <td>${renderBadge(q.statut)}</td>
+              <td>
+                <button class="btn btn-outline btn-sm" onclick="openQuoteModal(${q.id}, ${q.montant_estime || 0}, '${q.statut}', '${escapeJs(q.commentaires_garage || '')}')">
+                  ⚙️ Gérer
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // SAV
+        const sTbody = document.getElementById('adminSavTable');
+        if (data.savTickets.length === 0) {
+          sTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Aucun ticket SAV en cours.</td></tr>';
+        } else {
+          sTbody.innerHTML = data.savTickets.map(t => `
+            <tr>
+              <td>#${t.id}</td>
+              <td><strong>${t.prenom} ${t.nom}</strong><br><small style="color:#94a3b8;">${t.telephone || t.email}</small></td>
+              <td><strong>${t.titre}</strong></td>
+              <td><small>${t.description}</small></td>
+              <td>${renderBadge(t.statut)}</td>
+              <td>${t.reponse_garage ? `<span style="color:#34d399;">${t.reponse_garage}</span>` : '<span style="color:#94a3b8;">Aucune réponse pour le moment</span>'}</td>
+              <td>
+                <button class="btn btn-outline btn-sm" onclick="openSavModal(${t.id}, '${t.statut}', '${escapeJs(t.reponse_garage || '')}')">
+                  💬 Répondre
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // Clients
+        const cTbody = document.getElementById('adminClientsTable');
+        if (data.clients.length === 0) {
+          cTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Aucun client enregistré pour l’instant.</td></tr>';
+        } else {
+          cTbody.innerHTML = data.clients.map(c => `
+            <tr>
+              <td>#${c.id}</td>
+              <td><strong>${c.nom}</strong> ${c.prenom}</td>
+              <td>${c.email}</td>
+              <td>${c.telephone || '-'}</td>
+              <td>${c.adresse || '-'}</td>
+              <td><small>${new Date(c.created_at).toLocaleDateString('fr-FR')}</small></td>
+            </tr>
+          `).join('');
+        }
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderBadge(statut) {
+      switch(statut) {
+        case 'en_attente': return '<span class="badge badge-warning">En attente</span>';
+        case 'chiffre': return '<span class="badge badge-info">Chiffré</span>';
+        case 'accepte': return '<span class="badge badge-success">Accepté</span>';
+        case 'termine': return '<span class="badge badge-success">Terminé</span>';
+        case 'refuse': return '<span class="badge badge-danger">Refusé</span>';
+        case 'ouvert': return '<span class="badge badge-warning">Ouvert</span>';
+        case 'en_cours': return '<span class="badge badge-info">En cours</span>';
+        case 'resolu': return '<span class="badge badge-success">Résolu</span>';
+        case 'ferme': return '<span class="badge">Fermé</span>';
+        default: return `<span class="badge">${statut}</span>`;
+      }
+    }
+
+    function escapeJs(str) {
+      return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, ' ');
+    }
+
+    function openQuoteModal(id, price, status, notes) {
+      document.getElementById('editQuoteId').value = id;
+      document.getElementById('editQuotePrice').value = price || '';
+      document.getElementById('editQuoteStatus').value = status || 'chiffre';
+      document.getElementById('editQuoteNotes').value = notes || '';
+      openModal('modalEditQuote');
+    }
+
+    async function saveQuoteEdit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editQuoteId').value;
+      const montant_estime = parseFloat(document.getElementById('editQuotePrice').value);
+      const statut = document.getElementById('editQuoteStatus').value;
+      const commentaires_garage = document.getElementById('editQuoteNotes').value;
+
+      try {
+        const res = await fetch(`/api/admin/quotes/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ montant_estime, statut, commentaires_garage })
+        });
+        if (res.ok) {
+          closeModal('modalEditQuote');
+          loadAdminData();
+        }
+      } catch (err) {
+        alert("Erreur mise à jour devis.");
+      }
+    }
+
+    function openSavModal(id, status, reply) {
+      document.getElementById('editSavId').value = id;
+      document.getElementById('editSavStatus').value = status || 'en_cours';
+      document.getElementById('editSavReply').value = reply || '';
+      openModal('modalEditSav');
+    }
+
+    async function saveSavEdit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editSavId').value;
+      const statut = document.getElementById('editSavStatus').value;
+      const reponse_garage = document.getElementById('editSavReply').value;
+
+      try {
+        const res = await fetch(`/api/admin/sav/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ statut, reponse_garage })
+        });
+        if (res.ok) {
+          closeModal('modalEditSav');
+          loadAdminData();
+        }
+      } catch (err) {
+        alert("Erreur mise à jour SAV.");
+      }
+    }
+
+    async function loadGeminiStatus() {
+      try {
+        const res = await fetch('/api/admin/gemini-status');
+        const data = await res.json();
+        const badgeEl = document.getElementById('geminiStatusBadge');
+        const inputEl = document.getElementById('geminiApiKeyInput');
+        if (data.configured) {
+          badgeEl.innerHTML = `<span class="badge badge-success">✅ IA Gemini Active (${data.maskedKey})</span>`;
+          inputEl.placeholder = `Clé enregistrée (${data.maskedKey}) - Remplacer si besoin`;
+        } else {
+          badgeEl.innerHTML = `<span class="badge badge-warning">⚠️ Non configuré (Mode formulaire actif)</span>`;
+          inputEl.placeholder = `Collez votre clé API Gemini (AIzaSy...)`;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function saveGeminiApiKey() {
+      const inputEl = document.getElementById('geminiApiKeyInput');
+      const key = inputEl.value.trim();
+      const alertEl = document.getElementById('geminiKeyAlert');
+
+      try {
+        const res = await fetch('/api/admin/gemini-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey: key })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alertEl.style.display = 'block';
+          alertEl.textContent = key ? "Clé API Google Gemini enregistrée avec succès ! L'IA est prête." : "Clé retirée. L'assistant fonctionne en mode formulaires guidés.";
+          inputEl.value = '';
+          loadGeminiStatus();
+          setTimeout(() => { alertEl.style.display = 'none'; }, 4000);
+        }
+      } catch (e) {
+        alert("Erreur enregistrement clé API.");
+      }
+    }
+
+    async function handleLogout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/';
+    }
+
+    loadAdminData();
+    loadGeminiStatus();
+  </script>
+</body>
+</html>
+

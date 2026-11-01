@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace Client | 2L MOTORS LOMBARDO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/site/css/style.css">
+  <style>
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      margin-top: 2rem;
+    }
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .vehicle-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="navbar">
+      <a href="/" class="logo-container" title="2L MOTORS LOMBARDO">
+        <img src="/site/img/logo.jpg" class="logo-img" alt="Logo 2L Motors">
+        <div class="brand-name">
+          <span class="car-parking-text">2L MOTORS</span>
+          <span class="brand-lombardo">LOMBARDO</span>
+        </div>
+      </a>
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <span id="userGreeting" style="font-size: 0.9rem; color: #94a3b8;">Chargement...</span>
+        <a href="/" class="btn btn-outline btn-sm">Accueil</a>
+        <button onclick="handleLogout()" class="btn btn-outline btn-sm" style="color: #fda4af;">Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem;">Mon Espace Personnel</h1>
+        <p style="color: var(--text-muted);">Gérez vos véhicules, suivez vos devis et échangez avec notre service après-vente.</p>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; width: 100%;">
+        <button onclick="openModal('modalVehicle')" class="btn btn-outline btn-sm" style="flex: 1 1 auto;">🚗 Ajouter véhicule</button>
+        <button onclick="openModal('modalQuote')" class="btn btn-primary btn-sm" style="flex: 1 1 auto;">📋 Demander devis</button>
+        <button onclick="openModal('modalSav')" class="btn btn-warning btn-sm" style="flex: 1 1 auto;">🛠️ Ticket SAV</button>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      
+      <!-- Mes Véhicules -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>🚘 Mes Véhicules Enregistrés</h2>
+          <button onclick="openModal('modalVehicle')" class="btn btn-outline btn-sm">+ Nouveau véhicule</button>
+        </div>
+        <div id="vehiclesList">
+          <p style="color: var(--text-muted);">Aucun véhicule enregistré pour le moment.</p>
+        </div>
+      </section>
+
+      <!-- Mes Devis -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>📋 Mes Demandes de Devis</h2>
+          <button onclick="openModal('modalQuote')" class="btn btn-primary btn-sm">+ Nouveau devis</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Véhicule / Immat</th>
+                <th>Prestation / Panne</th>
+                <th>Statut</th>
+                <th>Montant Chiffré</th>
+                <th>Remarques Atelier</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="quotesTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted);">Chargement de vos devis...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Mon Service Après-Vente (SAV) -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>🛠️ Mes Dossiers SAV & Assistance</h2>
+          <button onclick="openModal('modalSav')" class="btn btn-warning btn-sm">+ Ouvrir un ticket SAV</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sujet</th>
+                <th>Description</th>
+                <th>Statut</th>
+                <th>Réponse de l'Atelier 2L Motors</th>
+              </tr>
+            </thead>
+            <tbody id="savTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted);">Chargement de vos tickets SAV...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODALE : AJOUTER UN VÉHICULE -->
+  <div class="modal-overlay" id="modalVehicle">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('modalVehicle')">✕</button>
+      <h3 style="margin-bottom: 1.5rem;">Enregistrer un véhicule</h3>
+      <form onsubmit="submitNewVehicle(event)">
+        <div class="form-group">
+          <label>Immatriculation *</label>
+          <input type="text" id="vehImmat" class="form-control" placeholder="AA-123-BB" required>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <div class="form-group" style="flex: 1;">
+            <label>Marque *</label>
+            <input type="text" id="vehMarque" class="form-control" placeholder="Ex: Renault, Peugeot, BMW" required>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Modèle *</label>
+            <input type="text" id="vehModele" class="form-control" placeholder="Ex: Clio 5, 308, Série 3" required>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <div class="form-group" style="flex: 1;">
+            <label>Année</label>
+            <input type="number" id="vehAnnee" class="form-control" placeholder="Ex: 2019">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Kilométrage</label>
+            <input type="number" id="vehKm" class="form-control" placeholder="Ex: 75000">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Ajouter ce véhicule</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALE : DEMANDER UN DEVIS -->
+  <div class="modal-overlay" id="modalQuote">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('modalQuote')">✕</button>
+      <h3 style="margin-bottom: 1.5rem;">Demander un devis de réparation</h3>
+      <form onsubmit="submitNewQuote(event)">
+        <div class="form-group">
+          <label>Sélectionner le véhicule *</label>
+          <select id="quoteVehicleSelect" class="form-control">
+            <!-- Rempli en JS -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span>Prestations souhaitées (sélection multiple avec calcul) :</span>
+            <span style="font-size: 0.78rem; color: #94a3b8;">Cochez une ou plusieurs options</span>
+          </label>
+          
+          <div id="servicesCheckboxesContainer" class="services-checklist">
+            <div style="color: #94a3b8; font-size: 0.85rem; padding: 0.5rem;">Chargement des forfaits...</div>
+          </div>
+
+          <!-- Addition en temps réel -->
+          <div class="quote-total-box">
+            <div>
+              <div class="quote-total-label">Total indicatif cumulé :</div>
+              <div style="font-size: 0.75rem; color: #94a3b8;" id="selectedServicesCount">0 prestation sélectionnée</div>
+            </div>
+            <div class="quote-total-amount"><span id="quoteTotalAmount">0.00</span> CHF</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description détaillée de la panne ou de l'entretien *</label>
+          <textarea id="quoteDescription" class="form-control" rows="3" placeholder="Bruit suspect à l'avant gauche, voyant moteur allumé, révision des 60 000 km..." required></textarea>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <div class="form-group" style="flex: 1;">
+            <label>Urgence</label>
+            <select id="quoteUrgence" class="form-control">
+              <option value="normale">Normale</option>
+              <option value="urgente">Urgente (panne bloquante)</option>
+              <option value="basse">Basse (entretien préventif)</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Date souhaitée</label>
+            <input type="date" id="quoteDate" class="form-control">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Transmettre ma demande</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALE : TICKET SAV -->
+  <div class="modal-overlay" id="modalSav">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('modalSav')">✕</button>
+      <h3 style="margin-bottom: 1.5rem;">Ouvrir un ticket SAV / Réclamation</h3>
+      <form onsubmit="submitNewSav(event)">
+        <div class="form-group">
+          <label>Objet du problème *</label>
+          <input type="text" id="savTitre" class="form-control" placeholder="Ex: Bruit persistant après changement plaquettes" required>
+        </div>
+        <div class="form-group">
+          <label>Détail de votre réclamation / question *</label>
+          <textarea id="savDescription" class="form-control" rows="4" placeholder="Expliquez en détail ce que vous constatez depuis la dernière intervention..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Priorité</label>
+          <select id="savPriorite" class="form-control">
+            <option value="normale">Normale</option>
+            <option value="urgente">Urgente</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-warning" style="width: 100%; margin-top: 1rem;">Envoyer au responsable SAV</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 <strong>2L MOTORS LOMBARDO</strong> - Espace Client Privé.</p>
+  </footer>
+
+  <script src="/site/js/client.js"></script>
+</body>
+</html>
+

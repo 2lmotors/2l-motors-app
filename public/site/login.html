@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion & Inscription | 2L MOTORS LOMBARDO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/site/css/style.css">
+  <style>
+    .auth-container {
+      max-width: 460px;
+      margin: 4rem auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 0.75rem;
+      text-align: center;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .auth-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .auth-error {
+      background: rgba(225, 29, 72, 0.15);
+      border: 1px solid var(--accent);
+      color: #fda4af;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .auth-success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--success);
+      color: #6ee7b7;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .auth-footer-logo {
+      margin-top: 2rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .auth-banner-img {
+      max-width: 240px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      opacity: 0.82;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      filter: drop-shadow(0 4px 12px rgba(220, 38, 38, 0.25));
+    }
+    .auth-banner-img:hover {
+      opacity: 1;
+      transform: scale(1.03);
+    }
+    @media (max-width: 500px) {
+      .auth-container {
+        margin: 1.5rem 0.75rem;
+        padding: 1.5rem 1rem;
+        border-radius: 12px;
+      }
+      .auth-banner-img {
+        max-width: 200px;
+      }
+      .navbar {
+        padding: 0.75rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="navbar">
+      <a href="/" class="logo-container" title="2L MOTORS LOMBARDO">
+        <img src="/site/img/logo.jpg" class="logo-img" alt="Logo 2L Motors">
+        <div class="brand-name">
+          <span class="car-parking-text">2L MOTORS</span>
+          <span class="brand-lombardo">LOMBARDO</span>
+        </div>
+      </a>
+      <a href="/" class="btn btn-outline btn-sm">← Retour au site</a>
+    </div>
+  </header>
+
+  <div class="auth-container">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Se connecter</button>
+      <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Créer un compte</button>
+    </div>
+
+    <div id="authAlert" class="auth-error"></div>
+    <div id="authSuccess" class="auth-success"></div>
+
+    <!-- Formulaire de Connexion -->
+    <form id="formLogin" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Adresse Email</label>
+        <input type="email" id="loginEmail" class="form-control" placeholder="exemple@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Se connecter</button>
+    </form>
+
+    <!-- Formulaire d'Inscription -->
+    <form id="formRegister" onsubmit="handleRegister(event)" style="display: none;">
+      <div style="display: flex; gap: 0.75rem;">
+        <div class="form-group" style="flex: 1;">
+          <label>Prénom *</label>
+          <input type="text" id="regPrenom" class="form-control" placeholder="Jean" required>
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label>Nom *</label>
+          <input type="text" id="regNom" class="form-control" placeholder="Dupont" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Adresse Email *</label>
+        <input type="email" id="regEmail" class="form-control" placeholder="jean.dupont@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>Numéro de Téléphone *</label>
+        <input type="tel" id="regTel" class="form-control" placeholder="06 12 34 56 78" required>
+      </div>
+      <div class="form-group">
+        <label>Adresse Postale / Ville</label>
+        <input type="text" id="regAdresse" class="form-control" placeholder="12 rue de la Paix, 75000">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe *</label>
+        <input type="password" id="regPassword" class="form-control" placeholder="••••••••" minlength="4" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Créer mon compte client</button>
+    </form>
+
+    <div class="auth-footer-logo">
+      <img src="/site/img/motors-2l-banner-dark.png" alt="2L MOTORS LOMBARDO" class="auth-banner-img">
+    </div>
+  </div>
+
+  <script>
+    function switchTab(mode) {
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const formLogin = document.getElementById('formLogin');
+      const formRegister = document.getElementById('formRegister');
+      const alertBox = document.getElementById('authAlert');
+      const succBox = document.getElementById('authSuccess');
+      alertBox.style.display = 'none';
+      succBox.style.display = 'none';
+
+      if (mode === 'login') {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        formLogin.style.display = 'block';
+        formRegister.style.display = 'none';
+      } else {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        formRegister.style.display = 'block';
+        formLogin.style.display = 'none';
+      }
+    }
+
+    function showError(msg) {
+      const b = document.getElementById('authAlert');
+      b.textContent = msg;
+      b.style.display = 'block';
+    }
+
+    function showSuccess(msg) {
+      const b = document.getElementById('authSuccess');
+      b.textContent = msg;
+      b.style.display = 'block';
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showError(data.error || 'Erreur lors de la connexion.');
+          return;
+        }
+
+        if (data.user.role === 'admin') {
+          window.location.href = '/admin.html';
+        } else {
+          window.location.href = '/dashboard.html';
+        }
+      } catch (err) {
+        showError('Impossible de joindre le serveur.');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const prenom = document.getElementById('regPrenom').value;
+      const nom = document.getElementById('regNom').value;
+      const email = document.getElementById('regEmail').value;
+      const telephone = document.getElementById('regTel').value;
+      const adresse = document.getElementById('regAdresse').value;
+      const password = document.getElementById('regPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prenom, nom, email, telephone, adresse, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showError(data.error || 'Erreur lors de l’inscription.');
+          return;
+        }
+
+        showSuccess('Votre compte est créé ! Redirection en cours...');
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 1200);
+      } catch (err) {
+        showError('Erreur de communication avec le serveur.');
+      }
+    }
+  </script>
+</body>
+</html>
+

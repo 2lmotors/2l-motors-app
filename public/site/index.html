@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2L MOTORS LOMBARDO | Réparations, Entretien Automobile & Devis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/site/css/style.css">
+</head>
+<body>
+
+  <!-- TOP-BAR DE CONTACT (Style Auto 2 & ProTech) -->
+  <div class="topbar">
+    <div class="topbar-content">
+      <div class="topbar-left">
+        <div class="topbar-item">
+          <span>📍</span> <span>Chemin de la Biole 10, 1860 Aigle (VD)</span>
+        </div>
+        <div class="topbar-item">
+          <span>🕒</span> <span>Lun-Ven: 07h30-12h00 / 13h30-18h00 &bull; Sam: 07h30-12h00</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-badge">
+          <span class="status-dot"></span> Atelier Ouvert
+        </div>
+        <div class="topbar-item">
+          <span>📞</span> <a href="tel:+41763466501"><strong>+41 76 346 65 01</strong></a>
+        </div>
+        <div class="topbar-item">
+          <span>✉️</span> <a href="mailto:ticino1996@hotmail.com">ticino1996@hotmail.com</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION PRINCIPALE HAUT DE GAMME -->
+  <header>
+    <div class="navbar">
+      <a href="/site/" class="logo-container" title="2L MOTORS LOMBARDO">
+        <img src="/site/img/logo.jpg" class="logo-img" alt="Logo 2L Motors Lombardo">
+        <div class="brand-name">
+          <span class="car-parking-text">2L MOTORS</span>
+          <span class="brand-lombardo">LOMBARDO</span>
+        </div>
+      </a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Menu de navigation" aria-expanded="false">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#services" onclick="closeMobileMenu()">Prestations & Tarifs</a></li>
+        <li><a href="#engagements" onclick="closeMobileMenu()">Nos Garanties</a></li>
+        <li><a href="#sav" onclick="closeMobileMenu()">Suivi SAV</a></li>
+        <li><a href="#contact" onclick="closeMobileMenu()">Contact & Horaires</a></li>
+        <li>
+          <a href="/" class="btn btn-primary btn-sm" style="background:#ef4444; border-color:#dc2626; color:#fff;">💬 Chat & App</a>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- NOUVEAU HERO SPLIT (Inspiré de ProTech Auto & Auto 2) -->
+  <section class="hero-split-section">
+    <div class="hero-split-container">
+      
+      <!-- Colonne Gauche : Présentation & Accroche -->
+      <div class="hero-left-col">
+        <div class="hero-tag-pro">
+          <span>⚙️</span> Atelier de Mécanique Haute Précision &bull; Aigle
+        </div>
+        <h1>Service de Réparation Automobile de <span>Qualité</span></h1>
+        <p>
+          Votre véhicule entre de bonnes mains. Diagnostic électronique de pointe, 
+          pièces d'origine constructeur et révisions avec garantie officielle préservée.
+        </p>
+        <div class="hero-actions">
+          <a href="#services" class="btn btn-primary">
+            📋 Demander un Devis en ligne
+          </a>
+          <button onclick="openChatBot('devis')" class="btn btn-outline">
+            💬 Discuter avec l'Atelier
+          </button>
+        </div>
+      </div>
+
+      <!-- Colonne Droite : Encart Offre Vedette (Style ProTech Auto) -->
+      <div class="hero-offer-card">
+        <div class="offer-header">
+          <span class="offer-badge">⭐ Forfait Recommandé</span>
+          <span style="font-size: 0.8rem; color: #34d399; font-weight: 700;">● Prise en charge rapide</span>
+        </div>
+        <h3 class="offer-title">Révision Complète Constructeur</h3>
+        <p class="offer-desc">
+          Entretien intégral selon le carnet de votre marque pour rouler en toute sécurité et préserver votre moteur.
+        </p>
+        <ul class="offer-features">
+          <li>Huile moteur synthèse homologuée constructeur</li>
+          <li>Remplacement filtre à huile, air & habitacle</li>
+          <li>Contrôle freinage, trains roulants & batterie</li>
+          <li>Passage valise diagnostic & mise à zéro témoin</li>
+        </ul>
+        <div class="offer-price-box">
+          <div>
+            <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Tarif Forfaitaire TTC</div>
+            <div class="offer-price-val">240.00 <span style="font-size: 1rem; color: #94a3b8;">CHF</span></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="selectServiceForQuote(2, 'Révision Complète Constructeur')">
+            Choisir ce forfait →
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BANDEAU DES 4 PILIERS DE QUALITÉ (Style ProTech Auto) -->
+  <div class="quality-pillars" id="engagements">
+    <div class="pillar-card">
+      <div class="pillar-icon">🛡️</div>
+      <div class="pillar-text">
+        <h4>Pièces de Qualité Origine</h4>
+        <p>Nous utilisons exclusivement des pièces homologuées première monte garantissant longévité et sécurité.</p>
+      </div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">⏱️</div>
+      <div class="pillar-text">
+        <h4>Tarifs & Délais Respectés</h4>
+        <p>Devis clair validé avant toute réparation. Aucun frais imprévu ni mauvaise surprise à la restitution.</p>
+      </div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">💻</div>
+      <div class="pillar-text">
+        <h4>Diagnostic Haute Précision</h4>
+        <p>Valises multimarques dernière génération pour identifier immédiatement la cause exacte des pannes.</p>
+      </div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">📜</div>
+      <div class="pillar-text">
+        <h4>Garantie Constructeur Préservée</h4>
+        <p>Respect scrupuleux du plan d'entretien officiel. Votre garantie de marque reste 100% active.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANDEAU DE STATISTIQUES & CONFIANCE (Style ProTech) -->
+  <section class="stats-trust-strip">
+    <div class="stats-trust-container">
+      <div class="stat-item">
+        <div class="stat-num">+ <span>2'500</span></div>
+        <div class="stat-label">Interventions Réalisées</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">+ <span>15</span> ans</div>
+        <div class="stat-label">D'Expérience & Savoir-Faire</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num"><span>100%</span></div>
+        <div class="stat-label">Devis Préalable Garanti</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">1860 <span>Aigle</span></div>
+        <div class="stat-label">Chablais & Riviera Suisse</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Services & Grille Tarifaire -->
+  <section class="section" id="services">
+    <div class="section-header">
+      <h2>Nos Forfaits & Prestations <span>Réparations</span></h2>
+      <p>Sélectionnez votre prestation pour obtenir un devis personnalisé ou cumuler plusieurs forfaits avec calcul automatique.</p>
+    </div>
+
+    <!-- Filtres par catégorie -->
+    <div class="filters" id="service-filters">
+      <button class="filter-btn active" data-filter="all">Toutes nos prestations</button>
+    </div>
+
+    <!-- Grille des cartes de tarifs -->
+    <div class="services-grid" id="services-container">
+      <!-- Les forfaits sont injectés automatiquement via app.js -->
+    </div>
+  </section>
+
+  <!-- Section Pourquoi 2L Motors / SAV -->
+  <section class="section" id="sav" style="background: linear-gradient(145deg, rgba(19, 27, 46, 0.75), rgba(9, 13, 22, 0.9)); border: 1px solid var(--border); border-radius: 20px;">
+    <div class="section-header">
+      <h2>Le Service Après-Vente & <span>Assistance Atelier</span></h2>
+      <p>Un accompagnement transparent avant, pendant et après chaque intervention sur votre véhicule.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-box">
+        <div class="feature-icon">🔍</div>
+        <h3>Suivi en direct de votre dossier</h3>
+        <p>Connectez-vous à votre espace privé pour consulter les devis chiffrés, valider vos réparations et échanger avec le chef d'atelier.</p>
+      </div>
+      <div class="feature-box">
+        <div class="feature-icon">⚡</div>
+        <h3>Validation Simple & Rapide</h3>
+        <p>Recevez votre chiffrage détaillé et acceptez ou refusez les travaux en 1 clic sans avoir à vous déplacer.</p>
+      </div>
+      <div class="feature-box">
+        <div class="feature-icon">🛠️</div>
+        <h3>Assistance SAV Dédiée</h3>
+        <p>Une question post-intervention ? Notre équipe technique vous répond et vous prend en charge en priorité.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coordonnées, Horaires & QR Code -->
+  <section class="section" id="contact">
+    <div class="section-header">
+      <h2>Atelier <span>2L MOTORS LOMBARDO</span></h2>
+      <p>Votre garage automobile à Aigle - Prise en charge professionnelle de tous véhicules</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; align-items: stretch;">
+      <div class="feature-box" style="text-align: left;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
+        <h3 style="font-size: 1.25rem; color: #fff;">Adresse de l'Atelier</h3>
+        <p style="margin-top: 0.5rem; line-height: 1.6;">
+          <strong>2L MOTORS LOMBARDO</strong><br>
+          Chemin de la Biole 10<br>
+          1860 Aigle (Suisse)
+        </p>
+        <div style="margin-top: 1.25rem;">
+          <a href="https://maps.google.com/?q=Chemin+de+la+Biole+10+1860+Aigle" target="_blank" class="btn btn-outline btn-sm" style="width: 100%;">
+            🗺️ Ouvrir dans Google Maps
+          </a>
+        </div>
+      </div>
+
+      <div class="feature-box" style="text-align: left;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🕒</div>
+        <h3 style="font-size: 1.25rem; color: #fff;">Horaires d'Ouverture</h3>
+        <p style="margin-top: 0.5rem; line-height: 1.7;">
+          <strong>Lundi au Vendredi :</strong><br>
+          07h30 - 12h00 &bull; 13h30 - 18h00<br><br>
+          <strong>Samedi :</strong><br>
+          07h30 - 12h00<br><br>
+          <span style="color: #94a3b8;">Dimanche : Fermé</span>
+        </p>
+      </div>
+
+      <div class="feature-box" style="text-align: left;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📞</div>
+        <h3 style="font-size: 1.25rem; color: #fff;">Contact Direct</h3>
+        <p style="margin-top: 0.5rem; line-height: 1.8;">
+          Téléphone : <a href="tel:+41763466501" style="color: #38bdf8; font-weight: 700;">+41 76 346 65 01</a><br>
+          Email : <a href="mailto:ticino1996@hotmail.com" style="color: #38bdf8;">ticino1996@hotmail.com</a><br>
+          SAV & Devis : <strong>En ligne 24/7</strong>
+        </p>
+        <div style="margin-top: 1.25rem;">
+          <a href="tel:+41763466501" class="btn btn-primary btn-sm" style="width: 100%;">
+            📲 Appeler l'Atelier
+          </a>
+        </div>
+      </div>
+
+      <!-- QR Code métallique de contact -->
+      <div class="feature-box" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(145deg, #131b2e, #090d16); border: 2px solid rgba(220, 38, 38, 0.4);">
+        <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.75rem;">QR Code 2L MOTORS</h3>
+        <img src="/qr-code.png" alt="QR Code Contact 2L Motors Lombardo" style="width: 160px; height: 160px; object-fit: cover; border-radius: 12px; border: 2px solid #475569; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.75rem;">Scannez pour enregistrer les coordonnées ou accéder aux applications</p>
+        <a href="/portail" class="btn btn-outline btn-sm" style="margin-top: 0.75rem; font-size: 0.8rem; width:100%;">📱 Portail & Applications</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+      <img src="/site/img/logo.jpg" class="logo-img" style="width: 36px; height: 36px;" alt="Logo">
+      <strong style="color: #fff; font-size: 1.1rem;">2L MOTORS LOMBARDO</strong>
+    </div>
+    <p>Chemin de la Biole 10, 1860 Aigle &bull; Tél: +41 76 346 65 01 &bull; ticino1996@hotmail.com</p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #64748b;">&copy; 2026 2L MOTORS LOMBARDO - Tous droits réservés.</p>
+  </footer>
+
+  <!-- BOUTON FLOTTANT DU CHATBOT (Mascotte mécano en salopette) -->
+  <div class="chat-launcher" onclick="toggleChatBot()" title="Discuter avec l'Assistant Mécanicien 2L Motors">
+    <img src="/site/img/mecano.svg" alt="Mécano 2L Motors" class="launcher-avatar">
+    <span class="launcher-badge">Devis 24/7</span>
+  </div>
+
+  <!-- FENÊTRE DU CHATBOT -->
+  <div class="chat-widget" id="chatWidget">
+    <div class="chat-header">
+      <div class="chat-header-title">
+        <div class="chat-avatar">
+          <img src="/site/img/mecano.svg" alt="Mécano">
+        </div>
+        <div>
+          <strong style="font-size: 0.95rem; font-family: var(--font-tech);">Léo &bull; Chef d'Atelier Virtuel</strong>
+          <div style="font-size: 0.75rem; color: #34d399;">● En ligne pour vous guider</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.35rem;">
+        <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" title="Activer / Désactiver la voix de Léo" class="chat-header-icon-btn">🔊</button>
+        <button onclick="toggleChatBot()" title="Fermer" class="chat-header-icon-btn" style="font-size: 1.25rem;">✕</button>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <!-- Messages du bot et réponses -->
+    </div>
+
+    <!-- Barre d'état d'écoute vocale -->
+    <div id="voiceStatusBar" class="voice-status-bar">
+      <span>🎙️</span>
+      <span id="voiceStatusText">Léo vous écoute... Parlez dans votre micro !</span>
+    </div>
+
+    <div class="chat-input-bar">
+      <button id="micBtn" class="chat-mic-btn" onclick="toggleSpeechRecognition()" title="Parler au micro (Saisie vocale)">
+        <span class="mic-icon">🎙️</span>
+      </button>
+      <input type="text" id="chatInput" placeholder="Écrivez ou dictez votre panne..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+      <button class="btn btn-primary btn-sm" onclick="sendChatMessage()">Envoyer</button>
+    </div>
+  </div>
+
+  <script src="/site/js/app.js"></script>
+  <script src="/site/js/chatbot.js"></script>
+</body>
+</html>
+

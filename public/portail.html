@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>2L MOTORS LOMBARDO | Portail Officiel & Téléchargements</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --card-bg: rgba(18, 24, 38, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-blue: #38bdf8;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* En-tête */
+    .header-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #38bdf8, #ef4444);
+    }
+
+    .logo-badge {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 12px;
+      border-radius: 16px;
+      background: #0f172a;
+      border: 2px solid rgba(56, 189, 248, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .logo-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .brand-title span {
+      color: #ef4444;
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* Carte Site Web - Mise en avant */
+    .site-web-card {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(2, 132, 199, 0.08));
+      border: 1.5px solid rgba(56, 189, 248, 0.5);
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .site-web-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+      transition: all 0.2s ease;
+      font-family: 'Chakra Petch', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .site-web-btn:hover, .site-web-btn:active {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6);
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    }
+
+    /* Cartes standard */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 18px;
+      padding: 20px 18px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .contact-icon {
+      font-size: 20px;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .contact-content {
+      flex: 1;
+    }
+
+    .contact-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .contact-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+
+    .contact-value a {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+
+    .action-btn-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-top: 6px;
+    }
+
+    /* Grille de téléchargement des applications */
+    .apps-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .app-download-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 14px 16px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .app-download-row:hover, .app-download-row:active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateX(3px);
+    }
+
+    .app-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .app-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .app-icon-wrap.android { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; }
+    .app-icon-wrap.ios { background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); color: #93c5fd; }
+    .app-icon-wrap.windows { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; }
+    .app-icon-wrap.web { background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; }
+
+    .app-text-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    .app-text-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .dl-badge {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 10px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .vcard-btn {
+      width: 100%;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1.5px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 13px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      margin-top: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .vcard-btn:active {
+      background: rgba(16, 185, 129, 0.3);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- En-tête officiel -->
+    <div class="header-card">
+      <div class="logo-badge">
+        <img src="/site/img/logo.jpg" alt="Logo 2L Motors" onerror="this.src='/sidebar-watermark.png'">
+      </div>
+      <h1 class="brand-title">2L MOTORS <span>LOMBARDO</span></h1>
+      <p class="brand-sub">Garage & Carrosserie toutes marques &bull; Aigle (Suisse)</p>
+    </div>
+
+    <!-- BOUTON VISITER NOTRE SITE WEB (VENTE2LM) -->
+    <div class="site-web-card">
+      <div style="font-size: 13px; color: #94a3b8; font-weight: 600;">
+        Catalogue véhicules, forfaits atelier & devis en ligne
+      </div>
+      <a href="https://twol-motors-lombardo.onrender.com/" target="_blank" rel="noopener" class="site-web-btn">
+        <span>🌐</span> VISITER NOTRE SITE WEB ↗
+      </a>
+    </div>
+
+    <!-- TÉLÉCHARGEMENT DES APPLICATIONS -->
+    <div class="card">
+      <div class="card-title">
+        <span>📲</span> Applications 2L Motors
+      </div>
+      <div class="apps-grid">
+
+        <!-- Android APK -->
+        <a href="/MOTORS-2L.apk" class="app-download-row" download>
+          <div class="app-info">
+            <div class="app-icon-wrap android">🤖</div>
+            <div>
+              <div class="app-text-title">Application Android</div>
+              <div class="app-text-desc">Fichier APK direct &bull; Téléphone & Tablette</div>
+            </div>
+          </div>
+          <div class="dl-badge">Installer ⬇️</div>
+        </a>
+
+        <!-- iOS WebClip / Profil -->
+        <a href="/MOTORS-2L.mobileconfig" class="app-download-row">
+          <div class="app-info">
+            <div class="app-icon-wrap ios">🍏</div>
+            <div>
+              <div class="app-text-title">Application iPhone / iPad</div>
+              <div class="app-text-desc">Profil iOS WebClip sécurisé &bull; 1 clic</div>
+            </div>
+          </div>
+          <div class="dl-badge">Installer ⬇️</div>
+        </a>
+
+        <!-- PC Windows -->
+        <a href="/MOTORS-2L.exe" class="app-download-row" download>
+          <div class="app-info">
+            <div class="app-icon-wrap windows">💻</div>
+            <div>
+              <div class="app-text-title">Application PC Windows</div>
+              <div class="app-text-desc">Fichier exécutable autonome .EXE</div>
+            </div>
+          </div>
+          <div class="dl-badge">Télécharger ⬇️</div>
+        </a>
+
+        <!-- Web Direct -->
+        <a href="/" class="app-download-row">
+          <div class="app-info">
+            <div class="app-icon-wrap web">💬</div>
+            <div>
+              <div class="app-text-title">Chat & Diagnostic Web</div>
+              <div class="app-text-desc">Accès immédiat dans le navigateur</div>
+            </div>
+          </div>
+          <div class="dl-badge">Ouvrir ↗️</div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- COORDONNÉES COMPLÈTES DE L'ATELIER -->
+    <div class="card">
+      <div class="card-title">
+        <span>📍</span> Coordonnées de l'Atelier
+      </div>
+      <div class="contact-list">
+
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div class="contact-content">
+            <div class="contact-label">Adresse</div>
+            <div class="contact-value">Chemin de la Biole 10<br>1860 Aigle (Suisse)</div>
+            <a href="https://maps.google.com/?q=Chemin+de+la+Biole+10+1860+Aigle" target="_blank" class="action-btn-sm">
+              🗺️ Ouvrir dans Google Maps
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div class="contact-content">
+            <div class="contact-label">Téléphone Direct</div>
+            <div class="contact-value">
+              <a href="tel:+41763466501">+41 76 346 65 01</a>
+            </div>
+            <a href="tel:+41763466501" class="action-btn-sm" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">
+              📲 Appeler maintenant
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div class="contact-content">
+            <div class="contact-label">Email</div>
+            <div class="contact-value">
+              <a href="mailto:ticino1996@hotmail.com">ticino1996@hotmail.com</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">🕒</div>
+          <div class="contact-content">
+            <div class="contact-label">Horaires d'Ouverture</div>
+            <div class="contact-value" style="font-size:13px; line-height: 1.5;">
+              <strong>Lun - Ven :</strong> 07h30 - 12h00 / 13h30 - 18h00<br>
+              <strong>Samedi :</strong> 07h30 - 12h00<br>
+              <span style="color:#94a3b8;">Dimanche : Fermé</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bouton vCard -->
+      <a href="/contact-2lmotors.vcf" class="vcard-btn" download>
+        <span>📇</span> Enregistrer le contact dans mon smartphone (.vcf)
+      </a>
+    </div>
+
+    <footer>
+      &copy; 2026 2L MOTORS LOMBARDO &bull; Aigle (Suisse)<br>
+      Tous droits réservés
+    </footer>
+
+  </div>
+
+</body>
+</html>

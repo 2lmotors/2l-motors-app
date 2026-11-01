@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>MOTORS 2L - Chat & Diagnostic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    [v-cloak] { display: none !important; }
+  </style>
+  <!-- PWA & Mobile Native App Metas (Android & iOS) -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#18191b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MOTORS 2L" />
+  <link rel="apple-touch-icon" href="/logo/1000087306.jpg" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[PWA] Service Worker actif', reg.scope))
+          .catch(err => console.warn('[PWA] Service Worker erreur', err));
+      });
+    }
+  </script>
+</head>
+<body class="modern-chat-body">
+
+<div id="app" v-cloak>
+
+  <!-- Toast container -->
+  <div class="toast-container">
+    <div
+      v-for="toast in toasts"
+      :key="toast.id"
+      class="toast"
+      :class="['toast-' + toast.type, toast.removing ? 'removing' : '']"
+    >
+      <span class="toast-icon">{{ toast.icon }}</span>
+      <div class="toast-body">
+        <div class="toast-title">{{ toast.title }}</div>
+        <div class="toast-text" v-if="toast.text">{{ toast.text }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading" v-if="appState === 'loading'">
+    <div class="spinner"></div>
+    <span>Chargement...</span>
+  </div>
+
+  <!-- Main app layout -->
+  <div class="app-layout" v-else-if="appState === 'ready'">
+
+    <!-- Modern App Header -->
+    <header class="app-header modern-header-metal">
+      <div class="header-left-actions">
+        <button class="header-metal-icon-btn" @click="sidebarOpen = !sidebarOpen" id="sidebar-toggle" title="Menu des salons &amp; utilisateurs" style="font-size:18px;">
+          ☰
+        </button>
+        <button v-if="activeRoom !== 'general'" class="header-metal-btn" @click="switchToGeneral" :title="t('nav.generalChannel')">
+          ‹
+        </button>
+        <div class="header-logo-badge">
+          <span class="wrench-icon">🔧</span>
+          <span class="header-title-text">{{ t('brand.title') }}</span>
+          <img src="/header-logo.png" alt="Logo Motors 2L" class="header-pistons-logo header-pistons-desktop-only" />
+        </div>
+      </div>
+
+      <div class="header-spacer"></div>
+
+      <div class="header-right-actions">
+        <!-- Sélecteur de Langue FR / EN (Desktop uniquement, sur mobile il est dans le menu latéral) -->
+        <div class="lang-selector-switch header-lang-desktop-only">
+          <button class="lang-btn" :class="{ active: currentLang === 'fr' }" @click="switchLang('fr')">FR</button>
+          <button class="lang-btn" :class="{ active: currentLang === 'en' }" @click="switchLang('en')">EN</button>
+        </div>
+
+        <!-- Maintien actif Smartphone / Toujours connecté -->
+        <button
+          class="header-metal-icon-btn"
+          :class="{ 'is-wake-active': wakeLockActive }"
+          @click="toggleWakeLock(true)"
+          :title="wakeLockActive ? 'Maintien actif : Votre smartphone reste allumé et connecté' : 'Cliquer pour empêcher la mise en veille et rester connecté'"
+          style="position: relative;"
+        >
+          <span :style="{ color: wakeLockActive ? '#22c55e' : '#94a3b8', fontSize: '14px' }">⚡</span>
+          <span v-if="wakeLockActive" class="wake-dot"></span>
+        </button>
+
+        <!-- Débloquer Micro & Caméra -->
+        <button class="header-metal-icon-btn" @click="requestMediaPermissions(true)" title="Autoriser Micro & Caméra (Smartphone & PC)">
+          🎙️
+        </button>
+
+        <!-- Appel Vidéo Live -->
+        <button v-if="canStartLiveVideo" class="header-metal-icon-btn" @click="startVideoCall" :title="t('chat.videoCall')">
+          📞
+        </button>
+
+        <!-- Notification admin offline -->
+        <button class="header-metal-icon-btn" @click="showOfflineAlertModal = true" :title="t('chat.alertAdmin')">
+          🚨
+        </button>
+
+        <!-- Admin Panel link -->
+        <a v-if="currentUser && currentUser.role === 'admin'" href="/admin.html" class="badge badge-admin badge-admin-header" style="text-decoration:none; padding:5px 8px; font-size:12px;">
+          <span>⚙️</span><span class="admin-text"> {{ t('nav.admin') }}</span>
+        </a>
+
+        <!-- User avatar & logout -->
+        <div class="header-user-avatar" :style="{ background: currentUser.avatar_color }" :title="currentUser.username">
+          {{ getInitials(currentUser.username) }}
+        </div>
+        <button class="header-metal-icon-btn" @click="logout" :title="t('nav.logout')">🚪</button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="app-content">
+
+      <!-- Backdrop mobile pour fermer au clic en dehors -->
+      <div class="sidebar-backdrop" v-if="sidebarOpen" @click="sidebarOpen = false"></div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar modern-sidebar" :class="{ open: sidebarOpen }">
+        <div class="sidebar-section">
+          <!-- Canal Général -->
+          <div
+            class="sidebar-room-item"
+            :class="{ active: activeRoom === 'general' }"
+            @click="switchToGeneral()"
+          >
+            <div class="sidebar-room-avatar" style="background:#1e293b;">🌐</div>
+            <div class="user-item-info">
+              <div class="user-item-name" style="font-weight:700;">{{ t('nav.generalChannel') }}</div>
+              <div class="user-item-role">{{ t('nav.generalSub') }}</div>
+            </div>
+          </div>
+
+          <!-- Assistant IA Automobile -->
+          <div
+            class="sidebar-room-item"
+            :class="{ active: activeRoom.startsWith('ai_') }"
+            @click="openAiChat()"
+          >
+            <div class="sidebar-room-avatar" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6);">🤖</div>
+            <div class="user-item-info">
+              <div class="user-item-name" style="font-weight:700; color:#60a5fa;">{{ t('nav.aiAssistant') }}</div>
+              <div class="user-item-role" style="color:#93c5fd;">{{ t('nav.aiSub') }}</div>
+            </div>
+            <div class="online-dot" style="background:#3b82f6; box-shadow:0 0 6px #3b82f6;"></div>
+          </div>
+
+          <div class="sidebar-title">
+            <span class="online-count">{{ onlineUsers.length }}</span>
+            {{ t('sidebar.onlineParticipants') }}
+          </div>
+        </div>
+
+        <div class="sidebar-users">
+          <div
+            v-for="user in onlineUsers"
+            :key="user.id"
+            class="user-item"
+            :class="{ active: activePrivateUser && activePrivateUser.id === user.id }"
+            @click="user.isAi ? openAiChat() : openPrivateChat(user)"
+            :style="{ cursor: 'pointer' }"
+          >
+            <div class="avatar avatar-sm avatar-metal-brushed" :style="{ background: user.avatar_color }">
+              {{ getInitials(user.username) }}
+            </div>
+            <div class="user-item-info">
+              <div class="user-item-name">
+                {{ user.username }}
+                <a
+                  v-if="currentUser && currentUser.role === 'admin' && getMapsLink(user.id)"
+                  :href="getMapsLink(user.id)"
+                  target="_blank"
+                  class="geo-link"
+                  title="GPS"
+                  @click.stop
+                >📍</a>
+              </div>
+              <div class="user-item-role" style="display:flex;align-items:center;gap:4px;margin-top:2px;">
+                <span>{{ user.role === 'admin' ? ('⚙️ ' + t('sidebar.admin')) : t('sidebar.member') }}</span>
+                <span class="status-busy-badge" v-if="user.busy">
+                  <span class="busy-dot"></span> {{ t('sidebar.busy') }}
+                </span>
+              </div>
+            </div>
+            <div class="online-dot" v-if="!user.busy"></div>
+          </div>
+        </div>
+
+        <!-- Lien actif vers le Site Web Officiel 2L Motors (vente2lm) -->
+        <a href="https://twol-motors-lombardo.onrender.com/" target="_blank" rel="noopener" class="sidebar-website-btn" title="Ouvrir le site officiel 2L MOTORS LOMBARDO">
+          <span class="sidebar-website-icon">🌐</span>
+          <span class="sidebar-website-text">Visiter notre site WEB</span>
+          <span class="sidebar-website-arrow">↗</span>
+        </a>
+
+        <!-- QR Code Connexion Rapide / Partage -->
+        <div class="sidebar-qr-wrapper" @click="showQrZoom = true" title="Cliquer pour agrandir le QR Code">
+          <div class="sidebar-qr-card">
+            <img src="/qr-code.png" alt="QR Code 2LMotors" class="sidebar-qr-img" />
+          </div>
+          <div class="sidebar-qr-caption">QR CODE ACCÈS DIRECT</div>
+        </div>
+
+        <!-- Sélecteur de langue dans le menu latéral pour smartphone -->
+        <div class="sidebar-lang-container">
+          <span style="font-size:11px; font-weight:700; color:#858892; text-transform:uppercase; letter-spacing:0.5px;">🌐 Langue</span>
+          <div class="lang-selector-switch">
+            <button class="lang-btn" :class="{ active: currentLang === 'fr' }" @click="switchLang('fr')">FR</button>
+            <button class="lang-btn" :class="{ active: currentLang === 'en' }" @click="switchLang('en')">EN</button>
+          </div>
+        </div>
+
+        <!-- FILIGRANE EN FOND TRANSPARENT (NON-INTERACTIF, DERRIÈRE LES PARTICIPANTS) -->
+        <div class="sidebar-bg-watermark" aria-hidden="true">
+          <img src="/sidebar-watermark.png" alt="Logo Motors 2L" class="sidebar-bg-watermark-img" />
+          <div class="sidebar-bg-watermark-caption">{{ t('brand.caption') }}</div>
+        </div>
+      </aside>
+
+      <!-- Main Chat Area -->
+      <main class="chat-area modern-chat-container" @click="sidebarOpen = false" style="position: relative;">
+
+        <!-- Alerte Administrateur Flottante au Milieu du Chat (Affichage 10s puis disparition automatique) -->
+        <div class="chat-center-alert-card" v-if="centerAlert" @click.stop>
+          <div class="chat-center-alert-header">
+            <div class="chat-center-alert-title-wrap">
+              <span class="chat-center-alert-pulse-icon">🚨</span>
+              <span class="chat-center-alert-title">ALERTE ADMINISTRATEUR</span>
+              <span v-if="centerAlert.badge" class="chat-center-alert-badge">{{ centerAlert.badge }}</span>
+            </div>
+            <button class="chat-center-alert-close-btn" @click="dismissCenterAlert" title="Fermer immédiatement">✕</button>
+          </div>
+          <div class="chat-center-alert-body">
+            <div class="chat-center-alert-sender-row">
+              <span class="chat-center-alert-sender-label">Envoyée par :</span>
+              <span class="chat-center-alert-sender-name">{{ centerAlert.fromUser }}</span>
+              <span v-if="centerAlert.time" class="chat-center-alert-time-tag">{{ centerAlert.time }}</span>
+            </div>
+            <div class="chat-center-alert-message-box">
+              « {{ centerAlert.message }} »
+            </div>
+          </div>
+          <div class="chat-center-alert-footer">
+            <div class="chat-center-alert-countdown-row">
+              <span v-if="centerAlertQueue && centerAlertQueue.length > 0" class="chat-center-alert-remaining-count">
+                +{{ centerAlertQueue.length }} autre{{ centerAlertQueue.length > 1 ? 's' : '' }} alerte{{ centerAlertQueue.length > 1 ? 's' : '' }}
+              </span>
+              <div class="chat-center-alert-countdown-text">
+                ⏱️ Disparaît dans <strong>{{ centerAlert.countdown }}</strong> seconde{{ centerAlert.countdown > 1 ? 's' : '' }}
+              </div>
+            </div>
+            <div class="chat-center-alert-progress-track">
+              <div class="chat-center-alert-progress-bar" :style="{ width: (centerAlert.countdown * 10) + '%' }"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top sub-header -->
+        <div class="chat-top-status-bar">
+          <div class="chat-profile-badge" v-if="activeRoom.startsWith('ai_')">
+            <div class="ai-avatar-glow">🤖</div>
+            <div>
+              <div style="font-weight:700; color:#fff; font-size:13.5px;">{{ t('chat.aiHeader') }}</div>
+              <div style="font-size:11px; color:#22c55e;">{{ t('chat.aiStatus') }}</div>
+            </div>
+          </div>
+
+          <div class="chat-profile-badge" v-else-if="activeRoom.startsWith('private_')">
+            <div style="display:flex; align-items:center; gap:4px;">
+              <div
+                v-for="m in (currentRoomMembers.length ? currentRoomMembers : (activePrivateUser ? [activePrivateUser] : []))"
+                :key="m.id"
+                class="avatar avatar-sm avatar-metal-brushed"
+                :style="{ background: m.avatar_color }"
+                :title="m.username"
+              >
+                {{ getInitials(m.username) }}
+              </div>
+            </div>
+            <div>
+              <div style="font-weight:700; color:#fff; font-size:13.5px; display:flex; align-items:center; gap:8px;">
+                <span>{{ t('chat.privateWith') }} {{ currentRoomMembers.length > 0 ? currentRoomMembers.map(m => m.username).join(', ') : (activePrivateUser ? activePrivateUser.username : 'Salon Privé') }}</span>
+                <span class="badge-members-count">{{ currentRoomMembers.length || 2 }}/4 max</span>
+              </div>
+              <div style="font-size:11px; color:#94a3b8;">
+                {{ t('chat.privateDesc') }}
+              </div>
+            </div>
+
+            <!-- Bouton Ajouter un membre (ADMIN UNIQUEMENT, MAX 4 AU TOTAL) -->
+            <button
+              v-if="currentUser && currentUser.role === 'admin'"
+              class="add-member-pill-btn"
+              @click="openAddMemberModal"
+              :disabled="currentRoomMembers.length >= 4"
+              :title="currentRoomMembers.length >= 4 ? 'Maximum 4 membres atteint dans ce salon' : 'Ajouter un membre à ce chat privé'"
+            >
+              <span>➕👥</span>
+              <span>Ajouter ({{ currentRoomMembers.length || 2 }}/4)</span>
+            </button>
+          </div>
+
+          <div class="chat-profile-badge" v-else>
+            <div style="font-size:18px; flex-shrink:0;">🌐</div>
+            <div style="min-width:0; overflow:hidden;">
+              <div style="font-weight:700; color:#fff; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ t('chat.generalHeader') }}</div>
+              <div style="font-size:11px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ t('chat.generalDesc') }}</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+            <button class="chat-tab" :class="{ active: !showMedia }" @click="showMedia = false">{{ t('nav.chat') }}</button>
+            <button class="chat-tab" :class="{ active: showMedia }" @click="toggleMediaView()">{{ t('nav.media') }}</button>
+          </div>
+        </div>
+
+        <!-- Bandeau Live Vidéo actif pour l'administrateur en pause/standby -->
+        <div v-if="adminLiveStandby && callState === 'idle'" class="live-standby-banner">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="rec-dot-pulse"></span>
+            <div>
+              <strong style="color:#22c55e;">Live vidéo toujours actif en arrière-plan</strong>
+              <div style="font-size:11px; color:#cbd5e1;">Les participants restent en direct. Vous pouvez réintégrer ou arrêter le live à tout instant.</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn btn-sm btn-success" @click="adminRejoinLive">
+              📹 Réintégrer le Live
+            </button>
+            <button class="btn btn-sm btn-danger" @click="endLiveForAll">
+              ⏹️ Terminer pour tous
+            </button>
+          </div>
+        </div>
+
+        <!-- Bandeau d'autorisation HTTPS & Matériel smartphone -->
+        <div v-if="!isHttps" class="https-permission-banner" @click="switchToHttps">
+          <span>🔒 Smartphone : Activez le mode sécurisé pour débloquer le Micro & la Caméra</span>
+          <button class="https-btn-action">Passer en HTTPS (3443)</button>
+        </div>
+        <div v-else-if="!mediaPermissionsGranted" class="media-unlock-strip" @click="requestMediaPermissions(true)">
+          <span>🎙️📹 Cliquez ici pour autoriser le Micro et la Caméra (indispensable pour vos messages vocaux & appels)</span>
+          <button class="media-unlock-btn">Autoriser</button>
+        </div>
+
+        <!-- Mediatheque view -->
+        <div class="media-library" v-if="showMedia">
+          <div class="media-library-header">
+            <span class="media-library-title">📁 Ma Médiathèque</span>
+            <button
+              v-if="mediaFiles.length > 0"
+              class="media-library-clear-btn"
+              @click="clearMyMediaLibrary"
+              title="Vider tous les médias de ma propre médiathèque"
+            >
+              🧹 Vider ma médiathèque
+            </button>
+          </div>
+          <div v-if="mediaFiles.length === 0" class="text-center text-muted" style="padding:40px">
+            {{ t('chat.emptyMedia') }}
+          </div>
+          <div class="media-grid" v-else>
+            <div v-for="file in mediaFiles" :key="file.id" class="media-grid-item">
+              <img v-if="file.media_type === 'image'" :src="file.media_url" @click="lightboxUrl = file.media_url" class="media-grid-img" />
+              <video v-else-if="file.media_type === 'video'" :src="file.media_url" class="media-grid-video" controls playsinline></video>
+              <div v-else-if="file.media_type === 'audio'" style="height:140px; display:flex; align-items:center; justify-content:center; background:#111;">
+                <audio :src="file.media_url" controls style="width:90%;"></audio>
+              </div>
+              <div class="media-grid-info">
+                <span class="media-grid-user">{{ file.username }}</span>
+                <span class="media-grid-date">{{ formatTime(file.created_at) }}</span>
+                <div class="media-grid-actions">
+                  <a :href="file.media_url" download class="media-grid-dl" :title="t('chat.download')">💾</a>
+                  <button class="media-grid-del" @click="deleteMediaFromMyLibrary(file)" title="Supprimer de ma médiathèque uniquement">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lightbox -->
+        <div class="lightbox" v-if="lightboxUrl" @click="lightboxUrl=null">
+          <img :src="lightboxUrl" @click.stop />
+          <button class="lightbox-close" @click="lightboxUrl=null">✕</button>
+        </div>
+
+        <!-- Messages stream -->
+        <div class="messages-container modern-messages-stream" ref="messagesContainer" @scroll="handleScroll" v-show="!showMedia">
+          <div v-if="messages.length === 0" class="text-center text-muted" style="padding:32px">
+            {{ activeRoom.startsWith('ai_') ? t('chat.noMessagesAi') : (activeRoom === 'general' ? t('chat.noMessagesGeneral') : t('chat.noMessagesPrivate')) }}
+          </div>
+
+          <div
+            v-for="msg in messages"
+            :key="msg.id"
+            class="mockup3-msg-wrapper"
+            :class="{ 'is-own': currentUser && msg.user_id === currentUser.id, 'is-system-notice': msg.is_system }"
+          >
+            <!-- Message personnel système (Inactivité ou statut) -->
+            <div v-if="msg.is_system" class="system-inactivity-banner">
+              <span style="font-size:16px;">⚠️</span>
+              <span>{{ msg.content }}</span>
+            </div>
+
+            <div v-else class="mockup3-bubble">
+              <div class="mockup3-bubble-header">
+                <span>{{ msg.username.toUpperCase() }} • {{ formatTime(msg.created_at) }}</span>
+                <button
+                  class="mockup3-msg-menu-btn"
+                  @click.stop="toggleMessageMenu(msg, $event)"
+                  title="Options du message"
+                >⋮</button>
+              </div>
+
+              <!-- Menu flottant d'options (ouvert vers l'intérieur, anti-débordement) -->
+              <div
+                v-if="activeMessageMenuId === msg.id"
+                class="msg-floating-menu"
+                :class="{ 'opens-up': menuOpenUpwards, 'opens-down': !menuOpenUpwards }"
+                @click.stop
+              >
+                <!-- Menu message audio : autorise uniquement écoute et pause -->
+                <template v-if="msg.media_type === 'audio'">
+                  <button
+                    class="msg-menu-item"
+                    @click="playAudioMessage(msg, 1)"
+                  >
+                    <span class="msg-menu-icon">▶</span>
+                    <span>Écouter le message</span>
+                  </button>
+                  <button
+                    class="msg-menu-item"
+                    @click="pauseAudioMessage(msg)"
+                  >
+                    <span class="msg-menu-icon">⏸</span>
+                    <span>Pause</span>
+                  </button>
+                  <button
+                    class="msg-menu-item"
+                    @click="setAudioSpeed(msg, activeAudioSpeed === 2 ? 1 : 2)"
+                  >
+                    <span class="msg-menu-icon">⚡</span>
+                    <span>{{ activeAudioSpeed === 2 ? 'Vitesse normale (1x)' : 'Écoute rapide (2x)' }}</span>
+                  </button>
+                </template>
+
+                <!-- Menu message texte : écoute et pause par synthèse vocale -->
+                <template v-else-if="msg.content && msg.content.trim().length > 0">
+                  <button
+                    class="msg-menu-item"
+                    @click="readTextMessage(msg)"
+                  >
+                    <span class="msg-menu-icon">▶</span>
+                    <span>Écouter le message</span>
+                  </button>
+                  <button
+                    class="msg-menu-item"
+                    @click="pauseTextMessage(msg)"
+                  >
+                    <span class="msg-menu-icon">⏸</span>
+                    <span>Pause</span>
+                  </button>
+                </template>
+
+                <!-- Télécharger le média (image, vidéo, audio, etc.) -->
+                <template v-if="msg.media_url">
+                  <div class="msg-menu-divider"></div>
+                  <button
+                    class="msg-menu-item"
+                    @click="downloadMediaMessage(msg)"
+                    title="Télécharger sur votre appareil"
+                  >
+                    <span class="msg-menu-icon">💾</span>
+                    <span>{{ msg.media_type === 'audio' ? 'Télécharger l\'audio' : (msg.media_type === 'video' ? 'Télécharger la vidéo' : (msg.media_type === 'image' ? 'Télécharger l\'image' : 'Télécharger le fichier')) }}</span>
+                  </button>
+                </template>
+
+                <!-- Gestion personnelle de l'historique (effacer ce message ou vider tout son historique) -->
+                <div class="msg-menu-divider"></div>
+                <button
+                  class="msg-menu-item msg-menu-item-danger"
+                  @click="deleteMessageFromMyHistory(msg)"
+                  title="Effacer ce message uniquement de votre propre affichage"
+                >
+                  <span class="msg-menu-icon">🗑️</span>
+                  <span>Effacer de mon historique</span>
+                </button>
+                <button
+                  class="msg-menu-item msg-menu-item-danger"
+                  @click="clearMyRoomHistory(activeRoom)"
+                  title="Vider tous les messages de mon historique pour cette discussion"
+                >
+                  <span class="msg-menu-icon">🧹</span>
+                  <span>Vider tout mon historique</span>
+                </button>
+              </div>
+
+              <div class="mockup3-bubble-content">
+                <span v-if="msg.content" v-html="formatMessageContent(msg.content)"></span>
+
+                <div v-if="msg.media_url" class="message-media">
+                  <div class="chat-media-wrapper" v-if="msg.media_type === 'image' || msg.media_type === 'video'">
+                    <img v-if="msg.media_type === 'image'" :src="msg.media_url" class="chat-media-img" @click="openLightbox(msg.media_url)" />
+                    <video v-else-if="msg.media_type === 'video'" :src="msg.media_url" class="chat-media-video" controls playsinline></video>
+                    <a :href="msg.media_url" download class="chat-media-dl">💾 {{ t('chat.download') }}</a>
+                  </div>
+
+                  <!-- Lecteur vocal interactif avec écoute rapide 2x au maintien -->
+                  <div
+                    class="audio-bubble-player"
+                    v-else-if="msg.media_type === 'audio'"
+                    :class="{ 'is-fast-holding': holdingMsgId === msg.id, 'is-playing': playingMsgId === msg.id }"
+                    @mousedown="onVoiceHoldStart(msg, $event)"
+                    @mouseup="onVoiceHoldEnd(msg, $event)"
+                    @mouseleave="onVoiceHoldEnd(msg, $event)"
+                    @touchstart.passive="onVoiceHoldStart(msg, $event)"
+                    @touchend.passive="onVoiceHoldEnd(msg, $event)"
+                    @touchcancel.passive="onVoiceHoldEnd(msg, $event)"
+                  >
+                    <button
+                      class="audio-bubble-play-btn"
+                      @click.stop="playingMsgId === msg.id ? pauseAudioMessage(msg) : playAudioMessage(msg, 1)"
+                      :title="playingMsgId === msg.id ? 'Pause' : 'Écouter'"
+                    >
+                      {{ playingMsgId === msg.id ? '⏸' : '▶' }}
+                    </button>
+
+                    <div class="audio-bubble-body">
+                      <div class="audio-bubble-wave-container">
+                        <span class="audio-wave-bar bar-1"></span>
+                        <span class="audio-wave-bar bar-2"></span>
+                        <span class="audio-wave-bar bar-3"></span>
+                        <span class="audio-wave-bar bar-4"></span>
+                        <span class="audio-wave-bar bar-5"></span>
+                        <span class="audio-wave-bar bar-6"></span>
+                        <span class="audio-wave-bar bar-7"></span>
+                        <span class="audio-wave-bar bar-8"></span>
+                      </div>
+                      <div class="audio-bubble-caption">
+                        <span v-if="holdingMsgId === msg.id" class="badge-fast-2x">⚡ 2X RAPIDE EN COURS</span>
+                        <span v-else>{{ playingMsgId === msg.id ? (activeAudioSpeed === 2 ? 'Lecture 2x...' : 'Lecture...') : 'Message Vocal (tenir pour 2x)' }}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      class="audio-speed-pill-btn"
+                      @click.stop="setAudioSpeed(msg, activeAudioSpeed === 2 ? 1 : 2)"
+                      :title="'Vitesse: ' + (activeAudioSpeed || 1) + 'x'"
+                    >
+                      {{ (activeAudioSpeed === 2 && playingMsgId === msg.id) || holdingMsgId === msg.id ? '2x' : '1x' }}
+                    </button>
+
+                    <audio
+                      :ref="'audio_' + msg.id"
+                      :src="msg.media_url"
+                      preload="metadata"
+                      @play="playingMsgId = msg.id"
+                      @pause="onAudioPause(msg)"
+                      @ended="onAudioEnded(msg)"
+                    ></audio>
+
+                    <a :href="msg.media_url" download class="audio-bubble-dl" title="Télécharger">💾</a>
+                  </div>
+                </div>
+              </div>
+              <div class="mockup3-bubble-footer" v-if="currentUser && msg.user_id === currentUser.id">
+                {{ formatTime(msg.created_at) }} • {{ t('chat.read') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing indicator -->
+        <div class="typing-indicator" style="min-height: 24px;" v-show="!showMedia">
+          <template v-if="typingUsers.length > 0">
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+            <span>{{ typingText }}</span>
+          </template>
+        </div>
+
+        <!-- Compte à rebours Inactivité de 15 minutes (15 secondes) avec bouton Rester connecté -->
+        <div v-if="inactivityWarning" class="inactivity-countdown-card">
+          <div class="inactivity-icon-pulse">⏳</div>
+          <div class="inactivity-body">
+            <div class="inactivity-title">⚠️ Inactivité de 15 minutes détectée !</div>
+            <div class="inactivity-subtitle">
+              Vous serez déconnecté automatiquement dans <span class="inactivity-badge-time">{{ inactivityCountdown }}s</span>
+            </div>
+          </div>
+          <button class="inactivity-stay-btn" @click="stayConnected">
+            ✋ Rester connecté
+          </button>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="modern-input-bar-mockup3" v-show="!showMedia">
+          <!-- Voice recording bar -->
+          <div class="voice-recording-bar" v-if="isRecordingVoice" style="position:absolute; bottom:64px; left:16px; right:16px;">
+            <span>🔴 {{ t('chat.voiceRecording') }} ({{ recordingDuration }}s)</span>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-sm btn-danger" @click="cancelVoiceRecording">{{ t('chat.cancel') }}</button>
+              <button class="btn btn-sm btn-success" @click="stopVoiceRecording">{{ t('chat.send') }}</button>
+            </div>
+          </div>
+
+          <!-- Emoji picker popover -->
+          <div class="emoji-picker-container" v-if="showEmojiPicker" style="bottom:68px; left:16px;">
+            <div class="emoji-grid">
+              <span v-for="em in emojis" :key="em" class="emoji-item" @click="insertEmoji(em)">{{ em }}</span>
+            </div>
+          </div>
+
+          <button class="input-circle-btn" @click="showEmojiPicker = !showEmojiPicker" title="Émojis">
+            +
+          </button>
+
+          <div class="modern-input-field-wrap">
+            <input
+              ref="chatInput"
+              v-model="newMessage"
+              type="text"
+              class="modern-text-input"
+              :placeholder="isRecordingVoice ? t('chat.recordingVoicePlaceholder') : t('chat.writeMessagePlaceholder')"
+              @keydown.enter.exact.prevent="sendMessage"
+              @input="onInputTyping"
+              @blur="stopTyping"
+            />
+            <label class="input-attach-label" title="Image / Vidéo">
+              📎
+              <input type="file" accept="image/*,video/*" style="display:none" @change="handleFileUpload" ref="fileInput" />
+            </label>
+          </div>
+
+          <button
+            class="input-circle-btn"
+            :class="{ recording: isRecordingVoice }"
+            @click="toggleVoiceRecording"
+            :title="t('chat.voiceRecording')"
+          >
+            🎙️
+          </button>
+
+          <button
+            class="send-circle-blue-btn"
+            @click="sendMessage"
+            :disabled="(!newMessage.trim() && !pendingMedia) || isRecordingVoice"
+            :title="t('chat.send')"
+          >
+            ➤
+          </button>
+        </div>
+      </main>
+
+    </div><!-- /app-content -->
+
+    <!-- Modal Notification Admin Hors-ligne -->
+    <div class="modal-overlay" v-if="showOfflineAlertModal" @click.self="showOfflineAlertModal = false">
+      <div class="modal-card" style="max-width:440px;">
+        <div class="modal-header">
+          <div style="font-size:22px;">🚨</div>
+          <div>
+            <div style="font-weight:700; font-size:16px;">{{ t('alertModal.title') }}</div>
+            <div style="font-size:12px; color:var(--silver-dark);">{{ t('alertModal.subtitle') }}</div>
+          </div>
+          <button class="modal-close" @click="showOfflineAlertModal = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px; color:#cbd5e1; margin-bottom:8px;">
+            {{ t('alertModal.desc') }}
+          </p>
+          <textarea
+            v-model="offlineAlertMessage"
+            class="form-control"
+            rows="4"
+            :placeholder="t('alertModal.placeholder')"
+            style="width:100%; border-radius:10px; padding:10px;"
+          ></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" @click="showOfflineAlertModal = false">{{ t('chat.cancel') }}</button>
+          <button class="btn btn-primary btn-sm" @click="sendAdminOfflineAlert" :disabled="!offlineAlertMessage.trim()">
+            {{ t('alertModal.sendAlert') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WebRTC Video Modals (Jusqu'à 4 participants en direct) -->
+    <div class="call-modal-overlay" v-if="callState === 'calling' || callState === 'connected'">
+      <div class="call-modal-box">
+        <!-- Top bar de l'appel vidéo avec titre, boutons et Menu Déroulant Admin en haut à droite -->
+        <div class="call-top-bar">
+          <div class="call-user-title-wrap">
+            <h3 style="font-family:var(--font-title); font-size:17px; margin:0; display:flex; align-items:center; gap:8px;">
+              <span>📹 Live Vidéo</span>
+              <span class="live-participants-pill">{{ totalLiveParticipants }}/4 en direct</span>
+            </h3>
+            <span style="color:var(--silver-dark); font-size:11px;">
+              {{ callState === 'calling' ? t('videoCall.callingWaiting') : (totalLiveParticipants > 1 ? `${totalLiveParticipants} participants connectés` : t('videoCall.liveConnected')) }}
+            </span>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px; position:relative;">
+            <!-- Badge Enregistrement actif (Admin) -->
+            <div v-if="isRecordingCall" class="call-rec-badge" style="margin-bottom:0;">
+              <span class="rec-dot-pulse"></span>
+              <span>REC {{ formatRecordDuration(callRecordDuration) }}</span>
+            </div>
+
+            <!-- Menu Déroulant Administrateur en haut à droite (sans déborder) -->
+            <div v-if="currentUser && currentUser.role === 'admin'" class="admin-live-dropdown-wrap">
+              <button
+                class="call-top-admin-menu-btn"
+                :class="{ active: showAdminLiveDropdown }"
+                @click.stop="showAdminLiveDropdown = !showAdminLiveDropdown"
+                title="Options Administrateur"
+              >
+                <span>⚙️ Admin</span>
+                <span style="font-size:10px;">{{ showAdminLiveDropdown ? '▲' : '▼' }}</span>
+              </button>
+
+              <div v-if="showAdminLiveDropdown" class="admin-live-dropdown-menu" @click.stop>
+                <div class="admin-live-menu-header">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span>🛡️</span>
+                    <span style="font-weight:700; font-size:13px; color:#fff;">Options Administrateur</span>
+                  </div>
+                  <button class="admin-live-menu-close" @click="showAdminLiveDropdown = false">✕</button>
+                </div>
+
+                <div class="admin-live-menu-body">
+                  <!-- 1. Inviter un membre au Live (max 4) -->
+                  <button
+                    class="admin-menu-row-btn"
+                    @click="openInviteLiveModal(); showAdminLiveDropdown = false;"
+                    :disabled="totalLiveParticipants >= 4"
+                  >
+                    <span class="admin-menu-row-icon">➕👥</span>
+                    <div class="admin-menu-row-info">
+                      <div class="admin-menu-row-title">Inviter un membre au direct</div>
+                      <div class="admin-menu-row-desc">Max. 4 participants (actuellement {{ totalLiveParticipants }}/4)</div>
+                    </div>
+                  </button>
+
+                  <!-- 2. Enregistrer le direct -->
+                  <button
+                    class="admin-menu-row-btn"
+                    :class="{ 'is-rec-on': isRecordingCall }"
+                    @click="toggleCallRecording(); showAdminLiveDropdown = false;"
+                  >
+                    <span class="admin-menu-row-icon">{{ isRecordingCall ? '⏹️' : '🔴' }}</span>
+                    <div class="admin-menu-row-info">
+                      <div class="admin-menu-row-title">{{ isRecordingCall ? 'Arrêter l\'enregistrement' : 'Enregistrer le direct' }}</div>
+                      <div class="admin-menu-row-desc">{{ isRecordingCall ? 'En cours (' + formatRecordDuration(callRecordDuration) + ')' : 'Enregistre vidéo et audio' }}</div>
+                    </div>
+                  </button>
+
+                  <!-- 3. S'absenter temporairement sans couper le direct -->
+                  <button
+                    class="admin-menu-row-btn"
+                    @click="adminLeaveLiveTemp(); showAdminLiveDropdown = false;"
+                  >
+                    <span class="admin-menu-row-icon">🚪</span>
+                    <div class="admin-menu-row-info">
+                      <div class="admin-menu-row-title">S'absenter temporairement</div>
+                      <div class="admin-menu-row-desc">Le live reste actif pour les participants</div>
+                    </div>
+                  </button>
+
+                  <div class="admin-menu-row-divider"></div>
+
+                  <!-- 4. Terminer le live pour tous -->
+                  <button
+                    class="admin-menu-row-btn btn-danger-action"
+                    @click="endLiveForAll(); showAdminLiveDropdown = false;"
+                  >
+                    <span class="admin-menu-row-icon">⏹️</span>
+                    <div class="admin-menu-row-info">
+                      <div class="admin-menu-row-title" style="color:#f87171;">Terminer le direct pour tous</div>
+                      <div class="admin-menu-row-desc">Arrête définitivement la session</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Grid Container (1 à 4 participants) -->
+        <div class="videos-container" :class="'grid-' + totalLiveParticipants">
+          <!-- Vidéo Locale (Vous) -->
+          <div class="video-wrapper local-video-tile">
+            <video ref="localVideo" autoplay playsinline webkit-playsinline muted></video>
+            <!-- Bouton tactile rapide pour smartphone : Retourner la caméra -->
+            <button
+              class="video-flip-quick-btn"
+              @click.stop="switchCamera"
+              title="Retourner la caméra (Avant / Arrière)"
+            >
+              <span>📷⇄</span>
+              <span>{{ currentCameraFacing === 'user' ? 'Caméra Arrière' : 'Caméra Avant' }}</span>
+            </button>
+            <span class="video-label">{{ t('videoCall.you') }} ({{ currentCameraFacing === 'user' ? 'Avant' : 'Arrière' }})</span>
+          </div>
+
+          <!-- Vidéos des pairs distants (jusqu'à 3 en multi-live) -->
+          <template v-if="remotePeersList.length > 0">
+            <div v-for="peer in remotePeersList" :key="peer.id" class="video-wrapper remote-video-tile">
+              <video
+                :ref="(el) => bindRemoteVideo(el, peer)"
+                autoplay
+                playsinline
+                webkit-playsinline
+              ></video>
+              <div v-if="!peer.hasStream && !peer.stream" class="video-loading-placeholder">
+                <span class="pulse-dot-live"></span>
+                <span>Connexion du flux...</span>
+              </div>
+              <span class="video-label">{{ peer.username }}</span>
+            </div>
+          </template>
+
+          <!-- Emplacement d'attente quand l'interlocuteur ne s'est pas encore connecté -->
+          <div v-else class="video-wrapper remote-video-tile waiting-tile">
+            <video ref="remoteVideo" autoplay playsinline webkit-playsinline></video>
+            <div class="video-loading-placeholder">
+              <span class="pulse-dot-live"></span>
+              <span>{{ callState === 'calling' ? 'Appel en cours...' : 'En attente des participants...' }}</span>
+            </div>
+            <span class="video-label">{{ activePrivateUser ? activePrivateUser.username : (callState === 'calling' ? 'En attente...' : t('videoCall.interlocutor')) }}</span>
+          </div>
+        </div>
+
+        <div class="call-controls">
+          <!-- Bouton Raccrocher / Déconnexion de l'appel -->
+          <button
+            class="call-btn-danger"
+            @click="currentUser && currentUser.role === 'admin' ? endLiveForAll() : leaveLiveCall()"
+            :title="currentUser && currentUser.role === 'admin' ? 'Terminer le live pour tous' : t('videoCall.hangUp')"
+          >
+            📞
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Ajouter un membre au salon privé (ADMIN UNIQUEMENT, MAX 4) -->
+    <div class="modal-overlay" v-if="showAddMemberModal" @click.self="showAddMemberModal = false">
+      <div class="modal-card" style="max-width:440px;">
+        <div class="modal-header">
+          <div style="font-size:22px;">➕👥</div>
+          <div>
+            <div style="font-weight:700; font-size:16px;">Ajouter un membre au chat privé</div>
+            <div style="font-size:12px; color:var(--silver-dark);">Maximum 4 participants au total (actuellement {{ currentRoomMembers.length }}/4)</div>
+          </div>
+          <button class="modal-close" @click="showAddMemberModal = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px; color:#cbd5e1; margin-bottom:12px;">
+            Sélectionnez le membre à inclure dans ce salon privé :
+          </p>
+
+          <div v-if="availableRoomUsers.length === 0" style="padding:16px; text-align:center; color:#94a3b8; background:rgba(0,0,0,0.25); border-radius:8px;">
+            Aucun autre utilisateur disponible à ajouter.
+          </div>
+          <div v-else>
+            <select v-model="selectedAddUserId" class="form-control" style="width:100%; border-radius:10px; padding:10px; margin-bottom:12px; background:#1e293b; color:#fff; border:1px solid #475569;">
+              <option value="" disabled>-- Choisir un utilisateur --</option>
+              <option v-for="u in availableRoomUsers" :key="u.id" :value="u.id">
+                {{ u.username }} ({{ u.role === 'admin' ? 'Administrateur' : 'Membre' }})
+              </option>
+            </select>
+          </div>
+
+          <div style="font-size:12px; color:#94a3b8; margin-top:8px;">
+            Participants actuels ({{ currentRoomMembers.length }}) :
+            <strong style="color:#f1f5f9;">{{ currentRoomMembers.map(m => m.username).join(', ') }}</strong>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" @click="showAddMemberModal = false">Annuler</button>
+          <button
+            class="btn btn-primary btn-sm"
+            @click="confirmAddMember"
+            :disabled="!selectedAddUserId || currentRoomMembers.length >= 4 || isLoadingAddMember"
+          >
+            {{ isLoadingAddMember ? 'Ajout en cours...' : 'Ajouter au salon' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Inviter un membre au Live Vidéo en direct (ADMIN UNIQUEMENT, MAX 4) -->
+    <div class="modal-overlay" v-if="showInviteLiveModal" @click.self="showInviteLiveModal = false">
+      <div class="modal-card" style="max-width:440px;">
+        <div class="modal-header">
+          <div style="font-size:22px;">📹➕</div>
+          <div>
+            <div style="font-weight:700; font-size:16px;">Inviter un membre au Live Vidéo</div>
+            <div style="font-size:12px; color:var(--silver-dark);">Maximum 4 participants simultanés (actuellement {{ totalLiveParticipants }}/4)</div>
+          </div>
+          <button class="modal-close" @click="showInviteLiveModal = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px; color:#cbd5e1; margin-bottom:12px;">
+            Choisissez le membre en ligne à faire entrer en direct dans le live :
+          </p>
+
+          <div v-if="availableLiveUsers.length === 0" style="padding:16px; text-align:center; color:#94a3b8; background:rgba(0,0,0,0.25); border-radius:8px;">
+            Aucun membre en ligne disponible à inviter pour le moment.
+          </div>
+          <div v-else>
+            <select v-model="selectedInviteLiveUserId" class="form-control" style="width:100%; border-radius:10px; padding:10px; margin-bottom:12px; background:#1e293b; color:#fff; border:1px solid #475569;">
+              <option value="" disabled>-- Choisir un utilisateur connecté --</option>
+              <option v-for="u in availableLiveUsers" :key="u.id" :value="u.id">
+                {{ u.username }} ({{ u.role === 'admin' ? 'Administrateur' : 'Membre' }})
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" @click="showInviteLiveModal = false">Annuler</button>
+          <button
+            class="btn btn-success btn-sm"
+            @click="confirmInviteMemberToLive"
+            :disabled="!selectedInviteLiveUserId || totalLiveParticipants >= 4"
+          >
+            Inviter en direct
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="call-modal-overlay" v-if="callState === 'incoming' && incomingCallData">
+      <div class="incoming-call-box">
+        <div class="avatar avatar-metal-brushed" style="width:64px;height:64px;font-size:24px;margin:0 auto 12px;" :style="{ background: incomingCallData.callerAvatar || '#cc0000' }">
+          {{ getInitials(incomingCallData.callerName) }}
+        </div>
+        <h3 style="font-size:20px;">{{ t('videoCall.incomingCall') }}</h3>
+        <p style="color:var(--silver-dark); margin:8px 0 20px;">
+          <strong>{{ incomingCallData.callerName }}</strong> {{ t('videoCall.incomingDesc') }}
+        </p>
+        <div style="display:flex; gap:20px; justify-content:center;">
+          <button class="call-btn-danger" @click="declineIncomingCall">{{ t('videoCall.decline') }}</button>
+          <button class="call-btn-accept" @click="acceptIncomingCall">{{ t('videoCall.accept') }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Dédiée Téléchargements Applications Mobiles & Desktop -->
+    <div class="modal-overlay" v-if="showDownloadsModal" @click.self="showDownloadsModal = false">
+      <div class="modal-card" style="max-width:440px; text-align:center; padding:22px 18px; box-sizing:border-box;">
+        <div class="modal-header" style="justify-content:center; position:relative; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:12px;">
+          <div style="font-size:18px; font-weight:800; color:#fff; display:flex; align-items:center; gap:8px;">
+            <span>📲</span> Applications MOTORS 2L
+          </div>
+          <button class="modal-close-btn" @click="showDownloadsModal = false" style="position:absolute; right:0; top:-4px; background:rgba(255,255,255,0.08); border:none; color:#cbd5e1; width:34px; height:34px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+        <p style="font-size:12.5px; color:#94a3b8; margin-bottom:18px; line-height:1.5;">
+          Installez MOTORS 2L pour un accès direct, fluide et avec plein écran sur votre appareil :
+        </p>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
+          <a href="/download/android" download class="modal-download-card-chip" style="background:linear-gradient(135deg, #16a34a, #15803d); box-shadow:0 4px 14px rgba(22,163,74,0.4);">
+            <span style="font-size:18px;">🤖</span> Android (APK 100% Fonctionnel)
+          </a>
+          <a href="/download/iphone" class="modal-download-card-chip" style="background:linear-gradient(135deg, #1e293b, #0f172a); border:1px solid rgba(255,255,255,0.25);">
+            <span style="font-size:18px;">🍏</span> iPhone / iPad (Profil iOS WebClip)
+          </a>
+          <a href="/download/windows" download class="modal-download-card-chip" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow:0 4px 14px rgba(37,99,235,0.4);">
+            <span style="font-size:18px;">💻</span> Windows 10 &amp; 11 (Application PC)
+          </a>
+        </div>
+        <div style="font-size:11.5px; color:#64748b; line-height:1.45;">
+          🌐 Fonctionne également directement sur Google Chrome, Safari, Edge et Firefox sans installation.
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Zoom QR Code -->
+    <div class="modal-overlay" v-if="showQrZoom" @click="showQrZoom = false" style="z-index: 4500;">
+      <div class="modal-card" style="max-width: 340px; text-align: center; padding: 22px 18px; box-sizing: border-box;" @click.stop>
+        <div class="modal-header" style="justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+          <div style="font-weight: 700; font-size: 15px; color: #fff; display:flex; align-items:center; gap:8px;">
+            <span>📷</span> QR Code Motors 2L
+          </div>
+          <button class="modal-close-btn" @click="showQrZoom = false" style="background:rgba(255,255,255,0.08); border:none; color:#cbd5e1; width:30px; height:30px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+        <div style="padding: 6px; background: #000; border-radius: 16px; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: inline-block;">
+          <img src="/qr-code.png" alt="QR Code Motors 2L" style="width: 100%; max-width: 260px; height: auto; border-radius: 12px; display: block;" />
+        </div>
+        <div style="margin-top: 14px;">
+          <a href="https://twol-motors-lombardo.onrender.com/" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; text-decoration:none; border-radius:10px; font-weight:700; font-size:13px; font-family:'Rajdhani', sans-serif; letter-spacing:0.5px;">
+            <span>🌐</span> VISITER NOTRE SITE WEB ↗
+          </a>
+        </div>
+        <div style="font-size: 12px; color: #94a3b8; margin-top: 10px; line-height: 1.4;">
+          Scannez avec un smartphone pour accéder au portail, coordonnées, vCard et téléchargements d'applications.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app-layout -->
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,12 @@
+node_modules/
+data/sessions.db*
+data/*.db-wal
+data/*.db-shm
+android/.gradle/
+android/app/build/
+android/build/
+ios/App/build/
+build-artifacts/
+.vscode/
+*.log
+.env

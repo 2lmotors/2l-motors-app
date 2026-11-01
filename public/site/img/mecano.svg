@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fed7aa"/>
+      <stop offset="100%" stop-color="#fba86c"/>
+    </linearGradient>
+    <linearGradient id="overallsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="capGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+    <linearGradient id="wrenchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Fond circulaire -->
+  <circle cx="60" cy="60" r="56" fill="url(#bgGrad)" stroke="#dc2626" stroke-width="3"/>
+
+  <!-- Épaules / T-shirt rouge -->
+  <path d="M 26 102 C 26 86, 38 78, 60 78 C 82 78, 94 86, 94 102 Z" fill="#e11d48"/>
+
+  <!-- Salopette bleue de mécano (corps) -->
+  <path d="M 36 104 C 36 88, 44 82, 60 82 C 76 82, 84 88, 84 104 Z" fill="url(#overallsGrad)"/>
+
+  <!-- Bretelles de la salopette -->
+  <path d="M 40 82 L 46 104 L 38 104 L 33 84 Z" fill="#1e40af"/>
+  <path d="M 80 82 L 74 104 L 82 104 L 87 84 Z" fill="#1e40af"/>
+
+  <!-- Boucles en métal des bretelles -->
+  <rect x="36" y="88" width="7" height="6" rx="1.5" fill="#e2e8f0" stroke="#64748b" stroke-width="1"/>
+  <rect x="77" y="88" width="7" height="6" rx="1.5" fill="#e2e8f0" stroke="#64748b" stroke-width="1"/>
+
+  <!-- Poche centrale de la salopette avec clé à molette qui dépasse -->
+  <rect x="49" y="93" width="22" height="15" rx="3" fill="#1e40af" stroke="#3b82f6" stroke-width="1"/>
+  <!-- Tournevis / Clé dans la poche -->
+  <path d="M 54 85 L 57 93 L 53 93 Z" fill="#f59e0b"/>
+  <circle cx="54" cy="85" r="2.5" fill="#ef4444"/>
+
+  <!-- Clé plate tenue en main à droite -->
+  <g transform="translate(80, 68) rotate(25)" filter="url(#shadow)">
+    <rect x="0" y="8" width="6" height="24" rx="2" fill="url(#wrenchGrad)" stroke="#475569" stroke-width="0.8"/>
+    <!-- Tête de clé -->
+    <path d="M -3 4 C -3 -2, 9 -2, 9 4 C 9 7, 7 8, 3 8 C -1 8, -3 7, -3 4 Z" fill="url(#wrenchGrad)" stroke="#475569" stroke-width="0.8"/>
+    <!-- Encoche clé -->
+    <rect x="1" y="-1" width="4" height="6" fill="#1e293b"/>
+  </g>
+
+  <!-- Cou -->
+  <rect x="52" y="66" width="16" height="15" rx="3" fill="url(#skinGrad)"/>
+
+  <!-- Oreilles -->
+  <circle cx="37" cy="53" r="6" fill="url(#skinGrad)"/>
+  <circle cx="83" cy="53" r="6" fill="url(#skinGrad)"/>
+
+  <!-- Tête / Visage -->
+  <ellipse cx="60" cy="52" rx="22" ry="21" fill="url(#skinGrad)" filter="url(#shadow)"/>
+
+  <!-- Yeux malicieux et souriants -->
+  <ellipse cx="51" cy="50" rx="3.5" ry="4.5" fill="#0f172a"/>
+  <circle cx="52.5" cy="48.5" r="1.3" fill="#ffffff"/>
+  <ellipse cx="69" cy="50" rx="3.5" ry="4.5" fill="#0f172a"/>
+  <circle cx="70.5" cy="48.5" r="1.3" fill="#ffffff"/>
+
+  <!-- Sourcils expressifs -->
+  <path d="M 46 43 Q 51 40 56 42" stroke="#451a03" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  <path d="M 64 42 Q 69 40 74 43" stroke="#451a03" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
+  <!-- Nez sympa -->
+  <ellipse cx="60" cy="55" rx="2.5" ry="1.8" fill="#ea580c" opacity="0.6"/>
+
+  <!-- Sourire confiant -->
+  <path d="M 52 59 Q 60 67 68 59" stroke="#7f1d1d" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <!-- Dents blanches -->
+  <path d="M 54 60 Q 60 64 66 60 Z" fill="#ffffff"/>
+
+  <!-- Petite trace de cambouis mignonne sur la joue (vrai mécano !) -->
+  <ellipse cx="44" cy="56" rx="2.5" ry="1.5" fill="#334155" opacity="0.4" transform="rotate(-15, 44, 56)"/>
+
+  <!-- Casquette de mécano rouge et noire -->
+  <!-- Visière noire courbée -->
+  <path d="M 33 39 C 33 34, 87 34, 87 39 C 87 43, 60 45, 33 39 Z" fill="#0f172a" stroke="#dc2626" stroke-width="1.2"/>
+  <!-- Calotte de la casquette -->
+  <path d="M 36 38 C 36 21, 50 16, 60 16 C 70 16, 84 21, 84 38 Z" fill="url(#capGrad)"/>
+  <!-- Bouton au sommet de la casquette -->
+  <circle cx="60" cy="16" r="3" fill="#0f172a"/>
+  <!-- Logo 2L sur la casquette -->
+  <text x="60" y="32" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="9" fill="#ffffff" text-anchor="middle">2L</text>
+
+</svg>
+

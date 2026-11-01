@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MOTORS 2L - Administration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    [v-cloak] { display: none !important; }
+
+    body.admin-mockup-body {
+      background: #0d0d0f;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      padding: 24px 16px max(60px, env(safe-area-inset-bottom)) 16px;
+      display: flex;
+      justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #e2e8f0;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 768px) {
+      body.admin-mockup-body {
+        padding: max(16px, env(safe-area-inset-top, 16px)) 8px max(110px, env(safe-area-inset-bottom, 90px)) 8px !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important;
+      }
+      .admin-mockup-container {
+        padding: 16px 12px 30px !important;
+        border-radius: 20px !important;
+        border-width: 1.5px !important;
+        max-width: 100% !important;
+        margin-bottom: 50px !important;
+      }
+      .admin-top-bar {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      .admin-header-actions {
+        width: 100% !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+      }
+      .top-stats-dropdown-panel,
+      .admin-alerts-floating-panel {
+        right: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        position: fixed !important;
+        top: 60px !important;
+        border-radius: 14px !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.95) !important;
+        max-height: 82vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        z-index: 3000 !important;
+      }
+      .dropdown-section-wrapper {
+        padding: 12px !important;
+        border-radius: 16px !important;
+      }
+      .selected-user-card {
+        padding: 16px 12px 20px !important;
+        margin-bottom: 25px !important;
+        box-sizing: border-box !important;
+      }
+      .table-responsive-scroll {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .admin-user-actions-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr !important;
+        gap: 6px !important;
+        width: 100% !important;
+        margin-top: 14px !important;
+        padding-top: 14px !important;
+        padding-bottom: 10px !important;
+        box-sizing: border-box !important;
+      }
+      .admin-user-actions-row button {
+        width: 100% !important;
+        min-height: 52px !important;
+        padding: 8px 4px !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        white-space: normal !important;
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1.25 !important;
+        border-radius: 10px !important;
+        box-sizing: border-box !important;
+      }
+    }
+
+    .admin-mockup-container {
+      width: 100%;
+      max-width: 920px;
+      background: linear-gradient(180deg, #18191b 0%, #101012 50%, #0a0a0c 100%);
+      border-radius: 36px;
+      padding: 30px 32px 40px;
+      border: 3px solid #2e2f33;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .admin-mockup-container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+      pointer-events: none;
+      border-radius: 36px;
+    }
+
+    .admin-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2a2c33;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .admin-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .admin-logo-circle {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #0f1012;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .admin-logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .admin-brand-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: #ffffff;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .admin-brand-sub {
+      font-size: 11.5px;
+      color: #8b8e96;
+      margin-top: 4px;
+      letter-spacing: 0.8px;
+    }
+
+    .admin-header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      position: relative;
+    }
+
+    .top-stats-dropdown-panel {
+      position: absolute;
+      top: 50px;
+      right: 90px;
+      width: 320px;
+      background: linear-gradient(180deg, #1d1f25 0%, #121317 100%);
+      border: 1.5px solid #383c46;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+      padding: 18px;
+      z-index: 1000;
+      animation: fadeInDown 0.2s ease;
+    }
+
+    @keyframes fadeInDown {
+      from { transform: translateY(-8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .stats-dropdown-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2a2c35;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stats-dropdown-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-mini-box {
+      background: #18191e;
+      border: 1px solid #282a32;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat-mini-val {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .stat-mini-lbl {
+      font-size: 10px;
+      color: #858892;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    .dropdown-section-wrapper {
+      background: #14161a;
+      border: 1px solid #282a31;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+      margin-top: 10px;
+    }
+
+    .dropdown-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .custom-select-styled {
+      width: 100%;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+      background: linear-gradient(135deg, #24272e 0%, #1a1c22 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      padding: 12px 38px 12px 14px;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.1), 0 4px 12px rgba(0,0,0,0.4);
+      transition: all 0.2s ease;
+      appearance: none;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 18px;
+    }
+    .custom-select-styled:focus {
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+    }
+    .custom-select-styled option {
+      background: #18191e;
+      color: #ffffff;
+      padding: 10px;
+    }
+
+    .selected-user-card {
+      margin-top: 24px;
+      background: linear-gradient(180deg, #1b1d22 0%, #121316 100%);
+      border: 1.5px solid #363942;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .selected-user-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #282a31;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+  </style>
+  <!-- PWA & Mobile Native App Metas (Android & iOS) -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#18191b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MOTORS 2L" />
+  <link rel="apple-touch-icon" href="/logo/1000087306.jpg" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[PWA] Service Worker actif', reg.scope))
+          .catch(err => console.warn('[PWA] Service Worker erreur', err));
+      });
+    }
+  </script>
+</head>
+<body class="admin-mockup-body">
+
+<div id="app" v-cloak style="width: 100%; display: flex; justify-content: center;">
+
+  <div class="toast-container">
+    <div v-for="toast in toasts" :key="toast.id" class="toast" :class="['toast-' + toast.type, toast.removing ? 'removing' : '']">
+      <span class="toast-icon">{{ toast.icon }}</span>
+      <div class="toast-body">
+        <div class="toast-title">{{ toast.title }}</div>
+        <div class="toast-text" v-if="toast.text">{{ toast.text }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-mockup-container">
+    <!-- Top Bar -->
+    <div class="admin-top-bar">
+      <div class="admin-brand-group">
+        <div class="admin-logo-circle">
+          <img src="/logo/1000087306.jpg" alt="Motors 2L" />
+        </div>
+        <div>
+          <h1 class="admin-brand-title">{{ t('brand.title') }}</h1>
+          <div class="admin-brand-sub">{{ t('brand.adminTagline') }}</div>
+        </div>
+      </div>
+
+      <div class="admin-header-actions">
+        <!-- Sélecteur de langue FR / EN -->
+        <div class="lang-selector-switch">
+          <button class="lang-btn" :class="{ active: currentLang === 'fr' }" @click="switchLang('fr')">FR</button>
+          <button class="lang-btn" :class="{ active: currentLang === 'en' }" @click="switchLang('en')">EN</button>
+        </div>
+
+        <a href="/index.html" class="metal-brushed-btn" style="text-decoration:none;">
+          💬 {{ t('nav.chat') }}
+        </a>
+        <button class="metal-brushed-btn" @click="loadData" :title="t('nav.refresh')">
+          🔄
+        </button>
+
+        <!-- Stats Live -->
+        <button
+          class="metal-brushed-btn"
+          :style="showFloatingStats ? 'border-color:#3b82f6 !important; background:linear-gradient(135deg, #1e3a8a, #172554) !important;' : ''"
+          @click="showFloatingStats = !showFloatingStats; if(showFloatingStats) showFloatingAlerts = false;"
+          :title="t('admin.liveStatsTitle')"
+        >
+          📊 {{ t('admin.statsLive') }} <span style="font-size:10px;">{{ showFloatingStats ? '▲' : '▼' }}</span>
+        </button>
+
+        <!-- Boîte Flottante des Alertes Administrateur -->
+        <button
+          class="metal-brushed-btn"
+          :style="showFloatingAlerts ? 'border-color:#ef4444 !important; background:linear-gradient(135deg, #451215, #2b0b0e) !important;' : ''"
+          @click="showFloatingAlerts = !showFloatingAlerts; if(showFloatingAlerts) showFloatingStats = false;"
+          title="Boîte des alertes et messages envoyés par les utilisateurs"
+        >
+          🚨 Alertes <span class="admin-alerts-badge" v-if="alerts.length">{{ alerts.length }}</span>
+          <span style="font-size:10px; margin-left:4px;">{{ showFloatingAlerts ? '▲' : '▼' }}</span>
+        </button>
+
+        <!-- Bouton Quitter -->
+        <button class="metal-brushed-btn btn-danger-brushed" @click="logout" :title="t('nav.exit')">
+          🚪 {{ t('nav.exit') }}
+        </button>
+
+        <!-- Boîte Flottante des Alertes & Messages Envoyés -->
+        <div class="admin-alerts-floating-panel" v-if="showFloatingAlerts">
+          <div class="admin-alerts-floating-header">
+            <div class="admin-alerts-title">
+              <span>🚨</span>
+              <span>Messages & Alertes Reçus ({{ alerts.length }})</span>
+            </div>
+            <div class="admin-alerts-actions-top">
+              <button
+                v-if="alerts.length > 0"
+                class="metal-brushed-btn btn-sm btn-danger-brushed"
+                @click="clearAllAlerts"
+                style="padding: 4px 8px; font-size: 11px;"
+                title="Supprimer tous les messages"
+              >
+                🗑️ Tout effacer
+              </button>
+              <button
+                style="background:none; border:none; color:#858892; cursor:pointer; font-size:15px; padding:0 4px;"
+                @click="showFloatingAlerts = false"
+              >✕</button>
+            </div>
+          </div>
+
+          <div v-if="alerts.length === 0" style="text-align: center; padding: 24px 10px; color: #94a3b8; font-size: 13px;">
+            📭 Aucun message ou alerte administrateur pour le moment.
+          </div>
+
+          <div class="admin-alerts-list" v-else>
+            <div class="admin-alert-item-card" v-for="alt in alerts" :key="alt.id">
+              <div class="admin-alert-item-top">
+                <div class="admin-alert-sender-info">
+                  <span>👤</span>
+                  <span>{{ alt.from_username }}</span>
+                </div>
+                <div class="admin-alert-time">
+                  📅 {{ formatAlertDate(alt.created_at) }}
+                </div>
+              </div>
+              <div class="admin-alert-message">
+                {{ alt.message }}
+              </div>
+              <div class="admin-alert-item-footer">
+                <button
+                  class="admin-alert-delete-single-btn"
+                  @click="deleteSingleAlert(alt.id)"
+                  title="Effacer ce message"
+                >
+                  🗑️ Effacer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Popover flottant des statistiques -->
+        <div class="top-stats-dropdown-panel" v-if="showFloatingStats && stats">
+          <div class="stats-dropdown-header">
+            <div style="font-weight:700; font-size:13px; display:flex; align-items:center; gap:6px;">
+              <span>📊</span> {{ t('admin.liveStatsTitle') }}
+            </div>
+            <button style="background:none; border:none; color:#858892; cursor:pointer; font-size:14px;" @click="showFloatingStats = false">✕</button>
+          </div>
+
+          <div class="stats-dropdown-grid">
+            <div class="stat-mini-box">
+              <div class="stat-mini-val">{{ stats.totalUsers }}</div>
+              <div class="stat-mini-lbl">{{ t('admin.registered') }}</div>
+            </div>
+            <div class="stat-mini-box">
+              <div class="stat-mini-val" style="color:#22c55e;">{{ stats.activeUsers }}</div>
+              <div class="stat-mini-lbl">{{ t('admin.active') }}</div>
+            </div>
+            <div class="stat-mini-box">
+              <div class="stat-mini-val" style="color:#3b82f6;">{{ stats.adminCount }}</div>
+              <div class="stat-mini-lbl">{{ t('admin.admins') }}</div>
+            </div>
+            <div class="stat-mini-box">
+              <div class="stat-mini-val">{{ stats.totalMessages }}</div>
+              <div class="stat-mini-lbl">{{ t('admin.messagesTotal') }}</div>
+            </div>
+            <div class="stat-mini-box" style="grid-column: 1 / -1;">
+              <div class="stat-mini-val" style="color:#eab308;">{{ stats.todayMessages }}</div>
+              <div class="stat-mini-lbl">{{ t('admin.messagesToday') }}</div>
+            </div>
+          </div>
+
+          <!-- Bouton Reset / Mise à zéro des statistiques -->
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <button
+              class="btn-danger-brushed"
+              @click="resetStats"
+              style="width: 100%; padding: 8px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;"
+              :title="t('admin.resetStats')"
+            >
+              <span>🔄</span> {{ t('admin.resetStats') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Menu Déroulant des Participants -->
+    <div class="dropdown-section-wrapper">
+      <div class="dropdown-label">
+        <span>👥</span> {{ t('admin.selectParticipant') }}
+      </div>
+
+      <select class="custom-select-styled" v-model="selectedUserId">
+        <option :value="null">{{ t('admin.choosePlaceholder') }} ({{ users.length }} {{ t('admin.registered') }})</option>
+        <option v-for="user in users" :key="user.id" :value="user.id">
+          {{ user.username }} &nbsp;—&nbsp; ({{ user.role === 'admin' ? ('⚙️ ' + t('sidebar.admin')) : ('👤 ' + t('sidebar.member')) }}) &nbsp;•&nbsp; {{ user.email }}
+        </option>
+      </select>
+
+      <!-- Fiche du participant choisi -->
+      <div class="selected-user-card" v-if="chosenUser">
+        <div class="selected-user-header">
+          <div class="avatar avatar-metal-brushed" :style="{ background: chosenUser.avatar_color, width:'56px', height:'56px', fontSize:'22px' }">
+            {{ getInitials(chosenUser.username) }}
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <span style="font-size:22px; font-weight:800; letter-spacing:0.5px;">{{ chosenUser.username }}</span>
+              <span class="badge" :class="chosenUser.role === 'admin' ? 'badge-role-admin' : 'badge-role-user'">
+                {{ chosenUser.role === 'admin' ? ('⚙️ ' + t('sidebar.admin')) : ('👤 ' + t('sidebar.member')) }}
+              </span>
+              <span class="badge" :class="chosenUser.is_active ? 'badge-active' : 'badge-inactive'">
+                {{ chosenUser.is_active ? ('✅ ' + t('admin.accountActive')) : ('🚫 ' + t('admin.accountInactive')) }}
+              </span>
+            </div>
+            <div style="font-size:13px; color:#94a3b8; margin-top:4px;">{{ chosenUser.email }}</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:20px; font-size:13px;">
+          <div class="info-row"><span class="info-label">📞 {{ t('admin.phoneLabel') }}</span><span style="font-weight:600;">{{ chosenUser.phone || t('admin.notReported') }}</span></div>
+          <div class="info-row"><span class="info-label">🏠 {{ t('admin.addressLabel') }}</span><span style="font-weight:600;">{{ chosenUser.address || t('admin.notReported') }}</span></div>
+          <div class="info-row"><span class="info-label">📅 {{ t('admin.registeredAt') }}</span><span>{{ formatDate(chosenUser.created_at) }}</span></div>
+          <div class="info-row"><span class="info-label">💬 {{ t('admin.messagesSent') }}</span><span>{{ chosenUser.message_count || 0 }}</span></div>
+          <div class="info-row" style="grid-column: 1 / -1;">
+            <span class="info-label">📍 {{ t('admin.liveGps') }}</span>
+            <span v-if="getUserLocation(chosenUser.id)">
+              <a :href="'https://www.google.com/maps?q=' + getUserLocation(chosenUser.id).lat + ',' + getUserLocation(chosenUser.id).lng + '&z=16'"
+                 target="_blank" class="metal-brushed-btn btn-sm" style="color:#22c55e; display:inline-flex; align-items:center; gap:6px;">
+                📍 {{ t('admin.openGoogleMaps') }} (±{{ Math.round(getUserLocation(chosenUser.id).accuracy || 0) }}m)
+              </a>
+            </span>
+            <span v-else style="color:#64748b;">{{ t('admin.offlineGps') }}</span>
+          </div>
+        </div>
+
+        <!-- Actions Administrateur -->
+        <div class="admin-user-actions-row" v-if="!currentUser || chosenUser.id !== currentUser.id">
+          <button class="metal-brushed-btn btn-sm" @click="toggleRole(chosenUser)">
+            {{ chosenUser.role === 'admin' ? ('⬇️ ' + t('admin.demoteUser')) : ('⬆️ ' + t('admin.promoteAdmin')) }}
+          </button>
+          <button class="metal-brushed-btn btn-sm" @click="toggleStatus(chosenUser)">
+            {{ chosenUser.is_active ? ('🚫 ' + t('admin.deactivateAccount')) : ('✅ ' + t('admin.activateAccount')) }}
+          </button>
+          <button class="metal-brushed-btn btn-sm btn-danger-brushed" @click="deleteUser(chosenUser); selectedUserId = null;">
+            🗑️ {{ t('admin.deleteUser') }}
+          </button>
+        </div>
+      </div>
+
+      <div v-else style="text-align:center; padding:36px; color:#64748b; font-size:13px;">
+        {{ t('admin.selectPrompt') }}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>MOTORS 2L - Connexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    [v-cloak] {
+      display: none !important;
+    }
+
+    body.mobile-design-body {
+      background: #0d0d0f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      padding: 16px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 480px) {
+      body.mobile-design-body {
+        padding: max(14px, env(safe-area-inset-top, 14px)) 8px max(24px, env(safe-area-inset-bottom, 20px)) 8px !important;
+        align-items: flex-start !important;
+      }
+      .phone-mockup-wrapper {
+        border-radius: 24px !important;
+        padding: 18px 14px 28px !important;
+        border-width: 1.5px !important;
+        max-width: 100% !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.8) !important;
+      }
+      .brand-title {
+        font-size: 26px !important;
+      }
+      .welcome-text {
+        font-size: 17px !important;
+      }
+      .custom-input-group {
+        margin-bottom: 10px !important;
+      }
+      .input-box {
+        padding: 10px 12px !important;
+      }
+      .btn-main-login {
+        padding: 12px !important;
+      }
+    }
+
+    .phone-mockup-wrapper {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(180deg, #18191b 0%, #101012 50%, #0a0a0c 100%);
+      border-radius: 46px;
+      padding: 26px 26px 36px;
+      border: 3px solid #2e2f33;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .top-phone-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .phone-notch {
+      width: 110px;
+      height: 26px;
+      background: #000;
+      border-radius: 20px;
+    }
+
+    .logo-cylinder {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: #0f1012;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .logo-cylinder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-size: 11.5px;
+      color: #8b8e96;
+      margin-top: 6px;
+      letter-spacing: 0.8px;
+      margin-bottom: 20px;
+    }
+
+    .welcome-text {
+      font-size: 19px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .welcome-sub {
+      font-size: 12.5px;
+      color: #777a82;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .custom-input-group {
+      width: 100%;
+      margin-bottom: 14px;
+    }
+
+    .custom-input-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #c9ccd4;
+      margin-bottom: 6px;
+    }
+
+    .input-box {
+      width: 100%;
+      background: #1b1c20;
+      border: 1px solid #32353c;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+
+    .input-box:focus-within {
+      border-color: #5c6270;
+      background: #202227;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+    }
+
+    .input-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 14px;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .input-box input::placeholder {
+      color: #545761;
+    }
+
+    .input-icon {
+      color: #7b808c;
+      font-size: 15px;
+    }
+
+    .btn-main-login {
+      width: 100%;
+      background: #ffffff !important;
+      color: #0b0c0e !important;
+      border: none !important;
+      border-radius: 12px !important;
+      padding: 14px !important;
+      font-size: 15px !important;
+      font-weight: 700 !important;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn-secondary-phone {
+      width: 100%;
+      background: transparent !important;
+      color: #ffffff !important;
+      border: 1px solid #363942 !important;
+      border-radius: 12px !important;
+      padding: 13px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      text-decoration: none;
+    }
+
+    .toggle-mode-text {
+      font-size: 12px;
+      color: #747883;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .toggle-mode-btn {
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 4px;
+      display: inline-block;
+    }
+
+    .legal-footer {
+      font-size: 10px;
+      color: #52555e;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .legal-footer span {
+      color: #8b8e96;
+    }
+
+    .app-dl-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .app-dl-chip:hover {
+      background: #2563eb;
+      border-color: #60a5fa;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+  <!-- PWA & Mobile Native App Metas (Android & iOS) -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#18191b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MOTORS 2L" />
+  <link rel="apple-touch-icon" href="/logo/1000087306.jpg" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[PWA] Service Worker actif', reg.scope))
+          .catch(err => console.warn('[PWA] Service Worker erreur', err));
+      });
+    }
+  </script>
+</head>
+
+<body class="mobile-design-body">
+
+  <div id="app" v-cloak style="width: 100%; display: flex; justify-content: center;">
+
+    <div class="toast-container">
+      <div v-for="toast in toasts" :key="toast.id" class="toast"
+        :class="['toast-' + toast.type, toast.removing ? 'removing' : '']">
+        <span class="toast-icon">{{ toast.icon }}</span>
+        <div class="toast-body">
+          <div class="toast-title">{{ toast.title }}</div>
+          <div class="toast-text" v-if="toast.text">{{ toast.text }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-mockup-wrapper">
+      <!-- Top bar avec Encoche + Sélecteur de Langue FR / EN -->
+      <div class="top-phone-bar">
+        <div style="width: 60px;"></div>
+        <div class="phone-notch"></div>
+        <div class="lang-selector-switch">
+          <button class="lang-btn" :class="{ active: currentLang === 'fr' }" @click="switchLang('fr')">FR</button>
+          <button class="lang-btn" :class="{ active: currentLang === 'en' }" @click="switchLang('en')">EN</button>
+        </div>
+      </div>
+
+      <!-- Logo circulaire 2L Motors -->
+      <div class="logo-cylinder">
+        <img src="/logo/1000087306.jpg" alt="MOTORS 2L" onerror="this.src='/logo/1000087275.jpg'" />
+      </div>
+
+      <h1 class="brand-title">{{ t('brand.title') }}</h1>
+      <div class="brand-sub">{{ t('brand.tagline') }}</div>
+
+      <div class="welcome-text">{{ mode === 'login' ? t('auth.welcomeBack') : t('auth.createAccount') }}</div>
+      <div class="welcome-sub">
+        {{ mode === 'login' ? t('auth.loginToContinue') : t('auth.joinCustomerPortal') }}
+      </div>
+
+      <!-- Error message -->
+      <div v-if="error"
+        style="width:100%; background:rgba(204,0,0,0.15); border:1px solid #cc0000; color:#ff7777; padding:8px 12px; border-radius:8px; font-size:12px; margin-bottom:12px; text-align:center;">
+        {{ error }}
+      </div>
+
+      <!-- FORMULAIRE LOGIN -->
+      <form v-if="mode === 'login'" @submit.prevent="login" style="width: 100%;">
+        <div class="custom-input-group">
+          <label>{{ t('auth.email') }}</label>
+          <div class="input-box">
+            <span class="input-icon">✉</span>
+            <input v-model="loginEmail" type="text" :placeholder="t('auth.emailPlaceholder')" required
+              autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="custom-input-group">
+          <label>{{ t('auth.password') }}</label>
+          <div class="input-box">
+            <span class="input-icon">🔒</span>
+            <input v-model="loginPassword" type="password" :placeholder="t('auth.passwordPlaceholder')" required
+              autocomplete="current-password" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-main-login" :disabled="loading">
+          <span v-if="loading">{{ t('auth.processing') }}</span>
+          <span v-else>{{ t('auth.logIn') }}</span>
+        </button>
+
+
+
+        <div class="toggle-mode-text">
+          {{ t('auth.dontHaveAccount') }} <br>
+          <span class="toggle-mode-btn" @click="mode = 'register'; error = ''">{{ t('auth.signUp') }}</span>
+        </div>
+      </form>
+
+      <!-- FORMULAIRE INSCRIPTION -->
+      <form v-if="mode === 'register'" @submit.prevent="register" style="width: 100%;">
+        <div class="custom-input-group">
+          <label>{{ t('auth.username') }}</label>
+          <div class="input-box">
+            <span class="input-icon">👤</span>
+            <input v-model="regUsername" type="text" :placeholder="t('auth.usernamePlaceholder')" required
+              minlength="2" />
+          </div>
+        </div>
+
+        <div class="custom-input-group">
+          <label>{{ t('auth.email') }}</label>
+          <div class="input-box">
+            <span class="input-icon">✉</span>
+            <input v-model="regEmail" type="email" :placeholder="t('auth.emailPlaceholder')" required />
+          </div>
+        </div>
+
+        <div class="custom-input-group">
+          <label>{{ t('auth.phone') }}</label>
+          <div class="input-box">
+            <span class="input-icon">📞</span>
+            <input v-model="regPhone" type="tel" :placeholder="t('auth.phonePlaceholder')" />
+          </div>
+        </div>
+
+        <div class="custom-input-group">
+          <label>{{ t('auth.password') }}</label>
+          <div class="input-box">
+            <span class="input-icon">🔒</span>
+            <input v-model="regPassword" type="password" :placeholder="t('auth.passwordMinChars')" required
+              minlength="6" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-main-login" :disabled="loading">
+          <span v-if="loading">{{ t('auth.creating') }}</span>
+          <span v-else>{{ t('auth.signUp') }}</span>
+        </button>
+
+        <div class="toggle-mode-text">
+          {{ t('auth.alreadyHaveAccount') }} <br>
+          <span class="toggle-mode-btn" @click="mode = 'login'; error = ''">{{ t('auth.logIn') }}</span>
+        </div>
+      </form>
+
+      <div class="legal-footer">
+        {{ t('auth.termsNotice') }} <span>{{ t('auth.terms') }}</span>
+      </div>
+
+      <!-- Téléchargement Applications Mobiles & Desktop -->
+      <div style="margin-top: 20px; padding: 14px 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; text-align: center;">
+        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+          📲 Installer l'application MOTORS 2L
+        </div>
+        <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+          <a href="/download/android" download class="app-dl-chip" title="Télécharger l'APK pour smartphone Android">
+            <span>🤖</span>
+            <span>Android (APK)</span>
+          </a>
+          <a href="/download/iphone" class="app-dl-chip" title="Installer le profil application pour iPhone / iPad">
+            <span>🍏</span>
+            <span>iPhone (iOS)</span>
+          </a>
+          <a href="/download/windows" download class="app-dl-chip" title="Télécharger l'application pour Windows 10 et 11">
+            <span>💻</span>
+            <span>Windows 10/11</span>
+          </a>
+        </div>
+        <div style="font-size: 10px; color: #64748b; margin-top: 8px;">
+          🌐 Également accessible directement sur Chrome, Safari et tous navigateurs
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+    import { i18nManager } from './js/i18n.js';
+
+    createApp({
+      data() {
+        return {
+          currentLang: i18nManager.currentLang,
+          mode: 'login',
+          loginEmail: '',
+          loginPassword: '',
+          regUsername: '',
+          regEmail: '',
+          regPhone: '',
+          regAddress: '',
+          regPassword: '',
+          error: '',
+          loading: false,
+          toasts: []
+        };
+      },
+
+      async mounted() {
+        await i18nManager.init();
+        this.currentLang = i18nManager.currentLang;
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error') === 'already_connected') {
+          this.error = 'Ce compte est déjà connecté sur un autre appareil. La connexion simultanée est interdite.';
+          return;
+        }
+        if (params.get('reason') === 'inactivity') {
+          this.error = 'Vous avez été déconnecté suite à une inactivité de 15 minutes dans le chat.';
+          return;
+        }
+
+        fetch('/api/auth/me')
+          .then(r => r.json())
+          .then(data => {
+            if (data.user) window.location.href = '/index.html';
+          })
+          .catch(() => { });
+      },
+
+      methods: {
+        t(key) {
+          return i18nManager.t(key);
+        },
+
+        async switchLang(lang) {
+          await i18nManager.setLanguage(lang);
+          this.currentLang = lang;
+        },
+
+        showToast(type, title, text = '') {
+          const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+          const toast = { id: Date.now(), type, title, text, icon: icons[type] || '🔔', removing: false };
+          this.toasts.push(toast);
+          setTimeout(() => {
+            toast.removing = true;
+            setTimeout(() => {
+              this.toasts = this.toasts.filter(t => t.id !== toast.id);
+            }, 300);
+          }, 3500);
+        },
+
+        async login() {
+          this.error = '';
+          this.loading = true;
+          try {
+            const res = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: this.loginEmail, password: this.loginPassword })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+              this.showToast('success', 'OK', `Bienvenue ${data.user.username}`);
+              setTimeout(() => window.location.href = '/index.html', 500);
+            } else {
+              this.error = data.error || 'Erreur de connexion.';
+            }
+          } catch {
+            this.error = 'Erreur réseau.';
+          } finally {
+            this.loading = false;
+          }
+        },
+
+        async register() {
+          this.error = '';
+          this.loading = true;
+          try {
+            const res = await fetch('/api/auth/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: this.regUsername,
+                email: this.regEmail,
+                phone: this.regPhone,
+                address: this.regAddress,
+                password: this.regPassword
+              })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+              this.showToast('success', 'OK', 'Bienvenue sur Motors 2L');
+              setTimeout(() => window.location.href = '/index.html', 500);
+            } else {
+              this.error = data.error || 'Erreur inscription.';
+            }
+          } catch {
+            this.error = 'Erreur réseau.';
+          } finally {
+            this.loading = false;
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>

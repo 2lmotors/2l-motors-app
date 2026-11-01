@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:2L MOTORS LOMBARDO
+ORG:2L MOTORS LOMBARDO
+TITLE:Garage & Atelier Mécanique Automobile
+TEL;TYPE=WORK,VOICE:+41763466501
+TEL;TYPE=CELL,VOICE:+41763466501
+EMAIL;TYPE=PREF,INTERNET:ticino1996@hotmail.com
+ADR;TYPE=WORK:;;Chemin de la Biole 10;Aigle;Vaud;1860;Suisse
+LABEL;TYPE=WORK:Chemin de la Biole 10\n1860 Aigle\nSuisse
+URL;TYPE=WORK:https://twol-motors-lombardo.onrender.com/
+NOTE:Garage automobile toutes marques à Aigle (Suisse). Réparations, révision, diagnostic valise, motos, utilitaires.
+END:VCARD
