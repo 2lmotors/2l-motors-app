@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN npm install --omit=dev
 # Copie du projet
 COPY . .
 
-# Environnement de production (le port est injecté dynamiquement par Render)
+# Environnement de production
 ENV NODE_ENV=production
 
 CMD ["node", "server.js"]
