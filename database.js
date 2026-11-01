@@ -25,6 +25,8 @@ db.exec(`
     role TEXT NOT NULL DEFAULT 'user',
     avatar_color TEXT NOT NULL DEFAULT '#cc0000',
     is_active INTEGER NOT NULL DEFAULT 1,
+    phone TEXT,
+    address TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     last_seen TEXT
   );
@@ -36,10 +38,20 @@ db.exec(`
     content TEXT NOT NULL DEFAULT '',
     media_url TEXT,
     media_type TEXT,
+    room_id TEXT DEFAULT 'general',
+    target_user_id INTEGER,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
 `);
+
+// Migrations pour anciennes bases de données existantes
+try { db.exec(`ALTER TABLE users ADD COLUMN phone TEXT`); } catch(e) {}
+try { db.exec(`ALTER TABLE users ADD COLUMN address TEXT`); } catch(e) {}
+try { db.exec(`ALTER TABLE messages ADD COLUMN media_url TEXT`); } catch(e) {}
+try { db.exec(`ALTER TABLE messages ADD COLUMN media_type TEXT`); } catch(e) {}
+try { db.exec(`ALTER TABLE messages ADD COLUMN room_id TEXT DEFAULT 'general'`); } catch(e) {}
+try { db.exec(`ALTER TABLE messages ADD COLUMN target_user_id INTEGER`); } catch(e) {}
 
 // Insert default admin if not exists
 const adminExists = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
@@ -87,34 +99,6 @@ if (robiUser) {
   console.log('[DB] Compte Robi (robustiano@hotmail.com) créé : rôle admin.');
 }
 
-// Migration: add media columns to messages if they don't exist yet
-try {
-  db.exec(`ALTER TABLE messages ADD COLUMN media_url TEXT`);
-  console.log('[DB] Migration: media_url ajouté');
-} catch(e) { /* colonne déjà présente */ }
-try {
-  db.exec(`ALTER TABLE messages ADD COLUMN media_type TEXT`);
-  console.log('[DB] Migration: media_type ajouté');
-} catch(e) { /* colonne déjà présente */ }
-
-// Migration: coordonnées et infos personnelles
-try {
-  db.exec(`ALTER TABLE users ADD COLUMN phone TEXT`);
-  console.log('[DB] Migration: phone ajouté');
-} catch(e) {}
-try {
-  db.exec(`ALTER TABLE users ADD COLUMN address TEXT`);
-  console.log('[DB] Migration: address ajouté');
-} catch(e) {}
-// Migration: support des salons privés
-try {
-  db.exec(`ALTER TABLE messages ADD COLUMN room_id TEXT DEFAULT 'general'`);
-  console.log('[DB] Migration: room_id ajouté à messages');
-} catch(e) {}
-try {
-  db.exec(`ALTER TABLE messages ADD COLUMN target_user_id INTEGER`);
-  console.log('[DB] Migration: target_user_id ajouté à messages');
-} catch(e) {}
 // Initialisation du compte Assistant IA
 const aiExists = db.prepare("SELECT id FROM users WHERE username = 'Assistant IA'").get();
 if (!aiExists) {
